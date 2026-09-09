@@ -1,0 +1,93 @@
+<section class="rsvp" id="rsvp" appReveal>
+  <div class="rsvp__wrap">
+    <div>
+      <div class="eyebrow">Confirmação</div>
+      <h2>Confirme<br/>sua presença</h2>
+      <p class="lede">Sua resposta é muito importante para nós!</p>
+      <div class="rsvp__deadline">Até 30 de junho de 2026</div>
+      <p class="rsvp__note">
+        Preencha o formulário — mesmo que ainda esteja em dúvida, é importante sinalizar para a organização do evento.
+      </p>
+    </div>
+
+    @if (!success()) {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="field" [class.error]="hasError('name')">
+          <label for="rsvp-name">Nome completo</label>
+          <input id="rsvp-name" type="text" formControlName="name" autocomplete="name" />
+          <div class="err">Por favor, informe seu nome.</div>
+        </div>
+
+        <div class="field" [class.error]="hasError('email')">
+          <label for="rsvp-email">E-mail para contato</label>
+          <input id="rsvp-email" type="email" formControlName="email" autocomplete="email" />
+          <div class="err">Informe um e-mail válido.</div>
+        </div>
+
+        <div class="field" [class.error]="hasError('phone')">
+          <label for="rsvp-phone">Telefone</label>
+          <input id="rsvp-phone" type="tel" formControlName="phone" autocomplete="tel" placeholder="(11) 9 0000-0000" />
+          <div class="err">Informe um telefone válido.</div>
+        </div>
+
+        <div class="field" [class.error]="hasError('attend')">
+          <label>Você poderá comparecer?</label>
+          <div class="radio-row">
+            <label class="radio-opt">
+              <input type="radio" [value]="AttendSim" formControlName="attend" />
+              <span>Sim, com alegria</span>
+            </label>
+            <label class="radio-opt">
+              <input type="radio" [value]="AttendNao" formControlName="attend" />
+              <span>Infelizmente não</span>
+            </label>
+          </div>
+          <div class="err">Escolha uma das opções.</div>
+        </div>
+
+        <div class="field" [class.error]="hasError('guests')">
+          <label for="rsvp-guests">Acompanhantes</label>
+          <select id="rsvp-guests" formControlName="guests">
+            <option [ngValue]="null" disabled>Selecione</option>
+            <option [ngValue]="0">Somente eu</option>
+            <option [ngValue]="1">+1 acompanhante</option>
+          </select>
+          <div class="err">Selecione uma opção.</div>
+        </div>
+
+        @if (showGuestNames()) {
+          <div class="field" [class.error]="hasError('guestNames')">
+            <label for="rsvp-guestnames">Nome do(s) acompanhante(s)</label>
+            <input id="rsvp-guestnames" type="text" formControlName="guestNames" placeholder="Nome completo" />
+            <div class="err">Informe o nome do(s) acompanhante(s).</div>
+          </div>
+        }
+
+        <div class="field">
+          <label for="rsvp-restrictions">Mensagem, observação, interesse no transfer do hotel</label>
+          <textarea id="rsvp-restrictions" formControlName="restrictions" placeholder="Opcional"></textarea>
+        </div>
+
+        @if (serverError(); as err) {
+          <div class="rsvp__server-error">{{ err }}</div>
+        }
+
+        <button type="submit" class="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Enviando…' : 'Enviar confirmação →' }}
+        </button>
+      </form>
+    } @else if (attended()) {
+      <div class="rsvp__success show">
+        <div class="eyebrow">Recebido</div>
+        <h3>Agradecemos sua resposta.</h3>
+        <p><em>Sua confirmação foi registrada.</em></p>
+      </div>
+    } @else {
+      <div class="rsvp__success show">
+        <div class="eyebrow">Recebido</div>
+        <h3>Sentiremos sua falta!</h3>
+        <p><em>Sua negativa foi registrada.</em></p>
+      </div>
+    }
+  </div>
+</section>

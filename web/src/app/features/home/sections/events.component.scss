@@ -1,0 +1,127 @@
+:host { display: block; }
+
+.events {
+  padding: 120px 32px;
+  background: var(--paper-2);
+  border-top: 1px solid rgba(20, 17, 13, 0.12);
+  border-bottom: 1px solid rgba(20, 17, 13, 0.12);
+}
+
+.events__head {
+  text-align: center;
+  margin-bottom: 80px;
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(40px, 5.5vw, 72px);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 18px;
+  }
+}
+
+.events__grid {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0;
+  max-width: 1040px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.events__divider {
+  background: rgba(20, 17, 13, 0.18);
+  position: relative;
+
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+    transform: translateX(-50%);
+  }
+
+  &::before { top: 0; }
+  &::after { bottom: 0; }
+}
+
+.event {
+  padding: 0 48px;
+  text-align: center;
+}
+
+.event__eyebrow {
+  font-family: var(--italic);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+
+.event__title {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(36px, 4.2vw, 52px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.event__time {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(44px, 5vw, 64px);
+  line-height: 1;
+  margin: 24px 0 14px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+
+.event__desc {
+  font-family: var(--serif-body);
+  font-size: 18px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  max-width: 380px;
+  margin: 0 auto 26px;
+
+  em { font-family: var(--italic); font-style: italic; color: var(--ink); }
+}
+
+.event__tag {
+  display: inline-block;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 11px 20px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+}
+
+@media (max-width: 800px) {
+  .events__grid { grid-template-columns: 1fr; gap: 60px; }
+  .events__divider {
+    height: 1px;
+    width: 60%;
+    justify-self: center;
+
+    &::before, &::after {
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    &::after { left: auto; right: 0; }
+  }
+  .event { padding: 0 16px; }
+}
+
+@media (max-width: 560px) {
+  .events { padding-left: 22px; padding-right: 22px; }
+  .event { padding: 0; }
+}

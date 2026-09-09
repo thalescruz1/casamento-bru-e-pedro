@@ -1,0 +1,57 @@
+<div class="toolbar">
+  <div class="stats">
+    <div><b>{{ stats().total }}</b> respostas</div>
+    <div><b>{{ stats().sim }}</b> sim</div>
+    <div><b>{{ stats().nao }}</b> não</div>
+    <div><b>{{ stats().attendees }}</b> presentes estimados</div>
+  </div>
+  <div class="actions">
+    <select (change)="filter.set($any($event.target).value)">
+      <option value="all">Todos</option>
+      <option value="sim">Só sim</option>
+      <option value="nao">Só não</option>
+    </select>
+    <a class="btn btn--solid" [href]="exportUrl" download>Exportar CSV ↓</a>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="state">Carregando…</div>
+} @else if (error()) {
+  <div class="state state--error">{{ error() }}</div>
+} @else {
+  <table class="rsvp-table">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Contato</th>
+        <th>Comparece</th>
+        <th>+1</th>
+        <th>Acompanhante(s)</th>
+        <th>Observação</th>
+        <th>Enviado em</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of filtered(); track row.id) {
+        <tr>
+          <td>{{ row.name }}</td>
+          <td>
+            <div>{{ row.email }}</div>
+            <div class="muted">{{ row.phone || '—' }}</div>
+          </td>
+          <td [class.yes]="attendLabel(row.attend) === 'Sim'" [class.no]="attendLabel(row.attend) === 'Não'">
+            {{ attendLabel(row.attend) }}
+          </td>
+          <td>{{ row.guests }}</td>
+          <td>{{ row.guestNames || '—' }}</td>
+          <td>{{ row.restrictions || '—' }}</td>
+          <td>{{ row.submittedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+      }
+      @if (filtered().length === 0) {
+        <tr><td colspan="7" class="empty">Nenhuma confirmação ainda.</td></tr>
+      }
+    </tbody>
+  </table>
+}

@@ -1,0 +1,52 @@
+<div class="toolbar">
+  <div class="stats">
+    <div><b>{{ stats().total }}</b> contribuições</div>
+    <div><b>{{ stats().paid }}</b> pagas</div>
+    <div><b>{{ stats().pending }}</b> pendentes</div>
+    <div><b>{{ stats().totalPaid | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</b> recebido</div>
+  </div>
+  <div class="actions">
+    <select (change)="filter.set($any($event.target).value)">
+      <option value="all">Todas</option>
+      <option value="paid">Só pagas</option>
+      <option value="pending">Só pendentes</option>
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="state">Carregando…</div>
+} @else if (error()) {
+  <div class="state state--error">{{ error() }}</div>
+} @else {
+  <table class="contrib-table">
+    <thead>
+      <tr>
+        <th>Valor</th>
+        <th>Status</th>
+        <th>Contribuinte</th>
+        <th>Mensagem</th>
+        <th>Pagamento</th>
+        <th>Pago em</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of filtered(); track row.id) {
+        <tr>
+          <td><strong>{{ row.amount | currency:row.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</strong></td>
+          <td [class]="statusClass(row.status)">{{ statusLabel(row.status) }}</td>
+          <td>
+            <div>{{ row.contributorName || '—' }}</div>
+            <div class="muted">{{ row.contributorEmail || '' }}</div>
+          </td>
+          <td>{{ row.message || '—' }}</td>
+          <td class="muted">{{ row.asaasPaymentId || '—' }}</td>
+          <td>{{ row.paidAt ? (row.paidAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+        </tr>
+      }
+      @if (filtered().length === 0) {
+        <tr><td colspan="6" class="empty">Nenhuma contribuição ainda.</td></tr>
+      }
+    </tbody>
+  </table>
+}

@@ -1,0 +1,319 @@
+<header class="gp__header">
+  <a class="gp__back" routerLink="/">← voltar</a>
+  <a class="gp__brand" routerLink="/">
+    <img src="assets/monogram-small.png" alt="HT monogram" />
+    <span>Heloisa &amp; Thales</span>
+  </a>
+  <span class="gp__spacer"></span>
+</header>
+
+<section class="gp__intro">
+  <div class="eyebrow"><span class="rule"></span> &nbsp; Lista de presentes &nbsp; <span class="rule"></span></div>
+  <h1>Um brinde<br/>ao que vem.</h1>
+  <p>
+    Sua presença já é o nosso maior presente. Para quem desejar ir além, escolhemos, com carinho,
+    estas <em>opções.</em> Logo depois do casamento, partimos para a nossa lua de mel em
+    <em>Florença</em>, e cada contribuição vai com a gente nessa viagem — pague com <em>Pix</em> ou
+    <em>cartão de crédito</em>.
+  </p>
+</section>
+
+@if (loading()) {
+  <div class="gp__state">Carregando…</div>
+} @else if (error()) {
+  <div class="gp__state gp__state--error">{{ error() }}</div>
+} @else if (gifts().length === 0) {
+  <div class="gp__state">A lista está sendo preparada — volte em breve.</div>
+} @else {
+  <section class="gp__contribution-card">
+    <div class="gp__contribution-card-inner">
+      <div class="eyebrow">Contribuição em valor livre</div>
+      <p class="gp__contribution-text">
+        Temos várias opções de presentes abaixo, mas caso prefira, você pode contribuir
+        aqui com qualquer outro valor que faça sentido para você!
+      </p>
+      <button type="button" class="btn btn--solid" (click)="openContributionModal()">Contribuir ↗</button>
+    </div>
+  </section>
+
+  <section class="gp__controls">
+    <div class="gp__control">
+      <label for="gift-sort">Ordenar</label>
+      <select id="gift-sort" [value]="sortMode()" (change)="sortMode.set($any($event.target).value)">
+        <option value="default">Padrão</option>
+        <option value="asc">Menor preço</option>
+        <option value="desc">Maior preço</option>
+      </select>
+    </div>
+    <div class="gp__control">
+      <label for="gift-range">Faixa de preço</label>
+      <select id="gift-range" [value]="priceRange()" (change)="priceRange.set($any($event.target).value)">
+        <option value="all">Todos</option>
+        <option value="lt-150">Até R$ 150</option>
+        <option value="150-500">R$ 150 a R$ 500</option>
+        <option value="gte-500">Acima de R$ 500</option>
+      </select>
+    </div>
+  </section>
+
+  @if (visibleGifts().length === 0) {
+    <div class="gp__state">Nenhum presente nessa faixa de preço. Tente outra opção.</div>
+  } @else {
+  <section class="gp__grid">
+    @for (gift of visibleGifts(); track gift.id) {
+      <article class="gift" [class.gift--taken]="gift.status !== AvailableStatus">
+        <div class="gift__img">
+          @if (gift.imageUrl) {
+            <img [src]="gift.imageUrl" [alt]="gift.title" loading="lazy" />
+          } @else {
+            <div class="gift__img-placeholder">HT</div>
+          }
+        </div>
+        <div class="gift__body">
+          <h3 class="gift__title">{{ gift.title }}</h3>
+          <p class="gift__desc">{{ gift.description }}</p>
+          <div class="gift__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</div>
+          @if (gift.status === AvailableStatus) {
+            <button type="button" class="btn btn--solid" (click)="openModal(gift)">Presentear</button>
+          } @else {
+            <span class="gift__taken">Esgotado</span>
+          }
+        </div>
+      </article>
+    }
+  </section>
+  }
+}
+
+@if (showContributionModal()) {
+  <app-contribution-modal (closed)="closeContributionModal()"></app-contribution-modal>
+}
+
+@if (selected(); as gift) {
+  <div class="modal" (click)="closeModal()">
+    <div class="modal__inner" (click)="$event.stopPropagation()">
+      <button type="button" class="modal__close" (click)="closeModal()" aria-label="Fechar">×</button>
+
+      @switch (step()) {
+
+        @case ('info') {
+          <div class="eyebrow">Presentear</div>
+          <h3>{{ gift.title }}</h3>
+          <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
+
+          <form [formGroup]="buyerForm" (ngSubmit)="goToMethod()" novalidate>
+            <div class="field" [class.error]="hasBuyerError('name')">
+              <label for="buyer-name">Seu nome</label>
+              <input id="buyer-name" type="text" formControlName="name" autocomplete="name" />
+              <div class="err">Informe seu nome.</div>
+            </div>
+            <div class="field" [class.error]="hasBuyerError('email')">
+              <label for="buyer-email">Seu e-mail</label>
+              <input id="buyer-email" type="email" formControlName="email" autocomplete="email" />
+              <div class="err">Informe um e-mail válido.</div>
+            </div>
+            <div class="field" [class.error]="hasBuyerError('message')">
+              <label for="buyer-message">Mensagem para os noivos <span class="optional">(opcional)</span></label>
+              <textarea id="buyer-message" formControlName="message" rows="3" maxlength="600" placeholder="Deixe um recadinho 💌"></textarea>
+              <div class="err">Mensagem muito longa.</div>
+            </div>
+
+            <button type="submit" class="btn btn--solid modal__submit">Escolher forma de pagamento →</button>
+          </form>
+        }
+
+        @case ('method') {
+          <div class="eyebrow">Como deseja pagar?</div>
+          <h3>{{ gift.title }}</h3>
+          <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
+
+          <div class="method-grid">
+            <button type="button" class="method-card" (click)="pickPix()" [disabled]="processing()">
+              <div class="method-card__icon">⚡</div>
+              <div class="method-card__title">Pix</div>
+              <div class="method-card__hint">Chave direta para os noivos</div>
+            </button>
+            <button type="button" class="method-card" (click)="pickCard()" [disabled]="processing()">
+              <div class="method-card__icon">💳</div>
+              <div class="method-card__title">Cartão de crédito</div>
+              <div class="method-card__hint">Pagamento à vista</div>
+            </button>
+          </div>
+
+          @if (processingError(); as err) {
+            <div class="modal__error">{{ err }}</div>
+          }
+
+          @if (processing()) {
+            <p class="modal__hint">Carregando…</p>
+          }
+        }
+
+        @case ('pix') {
+          <div class="eyebrow">Pague com Pix</div>
+          <h3>{{ gift.title }}</h3>
+          <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
+
+          @if (pixInfo(); as pix) {
+            <div class="pix-qr">
+              <img [src]="pixQrSrc()" alt="QR Code Pix" />
+            </div>
+
+            <p class="pix-qr-hint">
+              Abra o app do seu banco → <strong>Pix → Pagar com QR Code</strong> → aponte a câmera.
+              Ou use o <strong>Pix Copia e Cola</strong> abaixo.
+            </p>
+
+            <button type="button" class="btn pix-payload-copy" (click)="copyPixPayload()">
+              {{ pixCopied() ? 'Copiado ✓' : 'Copiar código Pix (copia e cola)' }}
+            </button>
+
+            <details class="pix-manual-details">
+              <summary>Prefere pagar com a chave manualmente?</summary>
+              <div class="pix-box">
+                <div class="pix-box__row">
+                  <span class="pix-box__label">{{ pixKeyTypeLabel(pix.pixKeyType) }}</span>
+                  <span class="pix-box__value">{{ pix.pixKey }}</span>
+                </div>
+                <div class="pix-box__row">
+                  <span class="pix-box__label">Beneficiário</span>
+                  <span class="pix-box__value">{{ pix.beneficiary }}</span>
+                </div>
+                @if (pix.bank) {
+                  <div class="pix-box__row">
+                    <span class="pix-box__label">Banco</span>
+                    <span class="pix-box__value">{{ pix.bank }}</span>
+                  </div>
+                }
+                <div class="pix-box__row">
+                  <span class="pix-box__label">Valor</span>
+                  <span class="pix-box__value">{{ pix.amount | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</span>
+                </div>
+                <button type="button" class="btn pix-box__copy" (click)="copyPix()">Copiar chave</button>
+              </div>
+            </details>
+
+            @if (processingError(); as err) {
+              <div class="modal__error">{{ err }}</div>
+            }
+
+            <button type="button" class="btn btn--solid modal__submit" (click)="confirmPixPayment()" [disabled]="processing()">
+              {{ processing() ? 'Registrando…' : 'Já paguei — reservar presente' }}
+            </button>
+            <p class="modal__hint">
+              Ao clicar em “Já paguei”, o presente é reservado pra você e enviaremos um e-mail de confirmação.
+              Os noivos confirmam o recebimento depois, diretamente no banco.
+            </p>
+          }
+        }
+
+        @case ('card') {
+          <div class="eyebrow">Cartão de crédito</div>
+          <h3>{{ gift.title }}</h3>
+          <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
+
+          <form [formGroup]="cardForm" (ngSubmit)="submitCard()" novalidate>
+            <div class="field" [class.error]="hasCardError('holderName')">
+              <label for="card-holder">Nome no cartão</label>
+              <input id="card-holder" type="text" formControlName="holderName" autocomplete="cc-name" />
+              <div class="err">Nome como impresso no cartão.</div>
+            </div>
+            <div class="field" [class.error]="hasCardError('number')">
+              <label for="card-number">Número do cartão</label>
+              <input id="card-number" type="text" formControlName="number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" appMask="cardNumber" maxlength="23" />
+              <div class="err">Número de cartão inválido.</div>
+            </div>
+            <div class="row-2">
+              <div class="field" [class.error]="hasCardError('expiry')">
+                <label for="card-exp">Validade</label>
+                <input id="card-exp" type="text" formControlName="expiry" inputmode="numeric" placeholder="MM/AA" autocomplete="cc-exp" appMask="expiry" maxlength="5" />
+                <div class="err">Formato MM/AA.</div>
+              </div>
+              <div class="field" [class.error]="hasCardError('ccv')">
+                <label for="card-ccv">CVV</label>
+                <input id="card-ccv" type="text" formControlName="ccv" inputmode="numeric" autocomplete="cc-csc" placeholder="000" maxlength="4" />
+                <div class="err">3 ou 4 dígitos.</div>
+              </div>
+            </div>
+
+            <div class="field" [class.error]="hasCardError('document')">
+              <label for="card-doc">CPF ou CNPJ</label>
+              <input id="card-doc" type="text" formControlName="document" inputmode="numeric" placeholder="000.000.000-00" appMask="cpfCnpj" maxlength="18" />
+              <div class="err">CPF (11 dígitos) ou CNPJ (14 dígitos) válido.</div>
+            </div>
+            <div class="field" [class.error]="hasCardError('phone')">
+              <label for="card-phone">Celular</label>
+              <input id="card-phone" type="tel" formControlName="phone" inputmode="tel" placeholder="(11) 90000-0000" autocomplete="tel" appMask="phone" maxlength="15" />
+              <div class="err">DDD + número.</div>
+            </div>
+            <div class="row-2">
+              <div class="field" [class.error]="hasCardError('postalCode')">
+                <label for="card-cep">CEP</label>
+                <input id="card-cep" type="text" formControlName="postalCode" inputmode="numeric" placeholder="00000-000" autocomplete="postal-code" appMask="cep" maxlength="9" />
+                <div class="err">CEP inválido.</div>
+              </div>
+              <div class="field" [class.error]="hasCardError('addressNumber')">
+                <label for="card-num">Número</label>
+                <input id="card-num" type="text" formControlName="addressNumber" inputmode="numeric" />
+                <div class="err">Número do endereço.</div>
+              </div>
+            </div>
+
+            @if (processingError(); as err) {
+              <div class="modal__error">{{ err }}</div>
+            }
+
+            <button type="submit" class="btn btn--solid modal__submit" [disabled]="processing()">
+              {{ processing() ? 'Processando…' : 'Finalizar pagamento' }}
+            </button>
+            <p class="modal__hint">
+              Pagamento processado com segurança pela Asaas. Dados do cartão não são armazenados neste site.
+            </p>
+          </form>
+        }
+
+        @case ('success-card') {
+          <div class="success">
+            <div class="success__claudio">
+              <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
+            </div>
+            <div class="eyebrow">Pagamento aprovado</div>
+            <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+            <p class="success__msg">
+              Sua contribuição <em>{{ gift.title }}</em> ({{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }})
+              foi confirmada. Você vai receber o recibo por e-mail em alguns minutos.
+            </p>
+            <button type="button" class="btn btn--solid modal__submit" (click)="closeModal()">Fechar</button>
+          </div>
+        }
+
+        @case ('pending-card') {
+          <div class="success">
+            <div class="success__check success__check--pending">⏳</div>
+            <div class="eyebrow">Em processamento</div>
+            <h3>Recebemos sua solicitação</h3>
+            <p class="success__msg">
+              O pagamento ainda está sendo confirmado pela operadora. Quando for aprovado, você recebe o recibo por e-mail.
+            </p>
+            <button type="button" class="btn btn--solid modal__submit" (click)="closeModal()">Fechar</button>
+          </div>
+        }
+
+        @case ('success-pix') {
+          <div class="success">
+            <div class="success__claudio">
+              <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
+            </div>
+            <div class="eyebrow">Presente reservado</div>
+            <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+            <p class="success__msg">
+              Anotamos seu Pix de <em>{{ gift.title }}</em>. Os noivos vão confirmar o recebimento no banco — você receberá o e-mail em seguida.
+            </p>
+            <button type="button" class="btn btn--solid modal__submit" (click)="closeModal()">Fechar</button>
+          </div>
+        }
+
+      }
+    </div>
+  </div>
+}

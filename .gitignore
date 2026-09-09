@@ -1,0 +1,60 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+## Functions
+local.settings.json
+.azure/
+.azurefunctions/
+
+## Secrets / env
+*.env
+*.env.local
+.env
+appsettings.Development.json
+appsettings.Local.json
+
+## Test / coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.opencover.xml
+
+## Angular / Node
+node_modules/
+web/.angular/
+web/dist/
+web/coverage/
+web/tmp/
+web/out-tsc/
+
+## SWA CLI
+.swa/
+
+## macOS / editors
+.DS_Store
+.idea/
+*.swp
+*.swo
+
+## Artifacts
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+
+## Design iteration artifacts (referência canônica está em /Users/thalescruz/Downloads/Site/)
+/Helo e Thales.html
+/assets/
+.swa-env-prod
+.swa-env-hml

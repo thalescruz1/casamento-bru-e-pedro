@@ -1,0 +1,42 @@
+:host { display: block; }
+
+footer {
+  text-align: center;
+  padding: 90px 32px 60px;
+  background: var(--ink);
+  color: var(--paper);
+
+  img {
+    width: 60px;
+    height: auto;
+    margin: 0 auto 24px;
+    filter: invert(1) brightness(1.1);
+  }
+
+  .names {
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: clamp(26px, 3.4vw, 38px);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .date {
+    font-family: var(--italic);
+    font-style: italic;
+    font-size: 18px;
+    letter-spacing: 0.06em;
+    color: rgba(242, 237, 228, 0.85);
+    margin-bottom: 36px;
+  }
+
+  .small {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(242, 237, 228, 0.6);
+  }
+}

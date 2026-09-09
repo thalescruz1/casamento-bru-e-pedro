@@ -1,0 +1,99 @@
+<div class="toolbar">
+  <div class="stats">
+    <div><b>{{ gifts().length }}</b> itens</div>
+    <div><b>{{ gifts() | filterByStatus:1 }}</b> disponíveis</div>
+    <div><b>{{ gifts() | filterByStatus:3 }}</b> pagos</div>
+  </div>
+  <button type="button" class="btn btn--solid" (click)="newGift()">+ Novo presente</button>
+</div>
+
+@if (loading()) {
+  <div class="state">Carregando…</div>
+} @else if (error()) {
+  <div class="state state--error">{{ error() }}</div>
+} @else if (gifts().length === 0) {
+  <div class="state">Nenhum presente cadastrado ainda. Clique em "Novo presente".</div>
+} @else {
+  <div class="list">
+    @for (gift of gifts(); track gift.id) {
+      <article class="row">
+        <div class="row__thumb">
+          @if (gift.imageUrl) {
+            <img [src]="gift.imageUrl" [alt]="gift.title" />
+          } @else {
+            <div class="thumb-ph">—</div>
+          }
+        </div>
+        <div class="row__main">
+          <h3>{{ gift.title }}</h3>
+          <p class="row__desc">{{ gift.description }}</p>
+          <div class="row__meta">
+            <span class="chip" [class]="statusClass(gift.status)">{{ statusLabel(gift.status) }}</span>
+            <span>{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</span>
+            @if (gift.buyerName) {
+              <span class="row__meta-item">· {{ gift.buyerName }} ({{ gift.buyerEmail }})</span>
+            }
+            @if (gift.paidAt) {
+              <span class="row__meta-item">· Pago em {{ gift.paidAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            }
+          </div>
+          @if (gift.buyerMessage) {
+            <p class="row__message">💌 “{{ gift.buyerMessage }}”</p>
+          }
+        </div>
+        <div class="row__actions">
+          <button type="button" (click)="edit(gift)" [disabled]="gift.status !== 1">Editar</button>
+          <button type="button" class="danger" (click)="delete(gift)" [disabled]="gift.status !== 1">Remover</button>
+        </div>
+      </article>
+    }
+  </div>
+}
+
+@if (showForm()) {
+  <div class="modal" (click)="closeForm()">
+    <div class="modal__inner" (click)="$event.stopPropagation()">
+      <button type="button" class="modal__close" (click)="closeForm()" aria-label="Fechar">×</button>
+      <div class="eyebrow">{{ editing() ? 'Editar presente' : 'Novo presente' }}</div>
+
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div class="field">
+          <label for="gift-title">Título</label>
+          <input id="gift-title" type="text" formControlName="title" />
+        </div>
+        <div class="field">
+          <label for="gift-desc">Descrição</label>
+          <textarea id="gift-desc" formControlName="description" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label for="gift-price">Valor (R$)</label>
+          <input id="gift-price" type="number" formControlName="price" min="1" step="0.01" />
+        </div>
+
+        <div class="field">
+          <label>Imagem</label>
+          @if (imagePreviewUrl(); as url) {
+            <div class="preview">
+              <img [src]="url" alt="Prévia" />
+              <button type="button" (click)="removeImage()">Remover</button>
+            </div>
+          } @else {
+            <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" [disabled]="uploading()" />
+            @if (uploading()) { <small>Enviando…</small> }
+          }
+        </div>
+
+        @if (formError(); as err) {
+          <div class="form-error">{{ err }}</div>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="btn" (click)="closeForm()" [disabled]="saving()">Cancelar</button>
+          <button type="submit" class="btn btn--solid" [disabled]="saving() || uploading()">
+            {{ saving() ? 'Salvando…' : 'Salvar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

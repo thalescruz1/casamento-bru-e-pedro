@@ -1,0 +1,231 @@
+<div class="modal" (click)="close()">
+  <div class="modal__inner" (click)="$event.stopPropagation()">
+    <button type="button" class="modal__close" (click)="close()" aria-label="Fechar">×</button>
+
+    @switch (step()) {
+
+      @case ('info') {
+        <div class="eyebrow">Contribuição em valor livre</div>
+        <h3>Defina sua contribuição</h3>
+        <p class="modal__hint">
+          Escolha um valor (mínimo R$ 5) e os mesmos dados de Pix ou cartão dos presentes valem aqui.
+        </p>
+
+        <form [formGroup]="buyerForm" (ngSubmit)="goToMethod()" novalidate>
+          <div class="field" [class.error]="hasBuyerError('amount')">
+            <label for="contrib-amount">Valor (R$)</label>
+            <input id="contrib-amount" type="number" inputmode="decimal" min="5" step="0.01" formControlName="amount" placeholder="50.00" />
+            <div class="err">Informe um valor a partir de R$ 5,00.</div>
+          </div>
+          <div class="field" [class.error]="hasBuyerError('name')">
+            <label for="contrib-name">Seu nome</label>
+            <input id="contrib-name" type="text" formControlName="name" autocomplete="name" />
+            <div class="err">Informe seu nome.</div>
+          </div>
+          <div class="field" [class.error]="hasBuyerError('email')">
+            <label for="contrib-email">Seu e-mail</label>
+            <input id="contrib-email" type="email" formControlName="email" autocomplete="email" />
+            <div class="err">Informe um e-mail válido.</div>
+          </div>
+          <div class="field" [class.error]="hasBuyerError('message')">
+            <label for="contrib-message">Mensagem para os noivos <span class="optional">(opcional)</span></label>
+            <textarea id="contrib-message" formControlName="message" rows="3" maxlength="600" placeholder="Deixe um recadinho 💌"></textarea>
+            <div class="err">Mensagem muito longa.</div>
+          </div>
+
+          <button type="submit" class="btn btn--solid modal__submit">Escolher forma de pagamento →</button>
+        </form>
+      }
+
+      @case ('method') {
+        <div class="eyebrow">Como deseja pagar?</div>
+        <h3>Contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</h3>
+
+        <div class="method-grid">
+          <button type="button" class="method-card" (click)="pickPix()" [disabled]="processing()">
+            <div class="method-card__icon">⚡</div>
+            <div class="method-card__title">Pix</div>
+            <div class="method-card__hint">Chave direta para os noivos</div>
+          </button>
+          <button type="button" class="method-card" (click)="pickCard()" [disabled]="processing()">
+            <div class="method-card__icon">💳</div>
+            <div class="method-card__title">Cartão de crédito</div>
+            <div class="method-card__hint">Pagamento à vista</div>
+          </button>
+        </div>
+
+        @if (processingError(); as err) {
+          <div class="modal__error">{{ err }}</div>
+        }
+
+        @if (processing()) {
+          <p class="modal__hint">Carregando…</p>
+        }
+      }
+
+      @case ('pix') {
+        <div class="eyebrow">Pague com Pix</div>
+        <h3>Contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</h3>
+
+        @if (pixInfo(); as pix) {
+          <div class="pix-qr">
+            <img [src]="pixQrSrc()" alt="QR Code Pix" />
+          </div>
+
+          <p class="pix-qr-hint">
+            Abra o app do seu banco → <strong>Pix → Pagar com QR Code</strong> → aponte a câmera.
+            Ou use o <strong>Pix Copia e Cola</strong> abaixo.
+          </p>
+
+          <button type="button" class="btn pix-payload-copy" (click)="copyPixPayload()">
+            {{ pixCopied() ? 'Copiado ✓' : 'Copiar código Pix (copia e cola)' }}
+          </button>
+
+          <details class="pix-manual-details">
+            <summary>Prefere pagar com a chave manualmente?</summary>
+            <div class="pix-box">
+              <div class="pix-box__row">
+                <span class="pix-box__label">{{ pixKeyTypeLabel(pix.pixKeyType) }}</span>
+                <span class="pix-box__value">{{ pix.pixKey }}</span>
+              </div>
+              <div class="pix-box__row">
+                <span class="pix-box__label">Beneficiário</span>
+                <span class="pix-box__value">{{ pix.beneficiary }}</span>
+              </div>
+              @if (pix.bank) {
+                <div class="pix-box__row">
+                  <span class="pix-box__label">Banco</span>
+                  <span class="pix-box__value">{{ pix.bank }}</span>
+                </div>
+              }
+              <div class="pix-box__row">
+                <span class="pix-box__label">Valor</span>
+                <span class="pix-box__value">{{ pix.amount | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</span>
+              </div>
+              <button type="button" class="btn pix-box__copy" (click)="copyPix()">Copiar chave</button>
+            </div>
+          </details>
+
+          @if (processingError(); as err) {
+            <div class="modal__error">{{ err }}</div>
+          }
+
+          <button type="button" class="btn btn--solid modal__submit" (click)="confirmPixPayment()" [disabled]="processing()">
+            {{ processing() ? 'Registrando…' : 'Já paguei — registrar contribuição' }}
+          </button>
+          <p class="modal__hint">
+            Ao clicar em "Já paguei", registramos sua contribuição e enviamos um e-mail de confirmação.
+            Os noivos confirmam o recebimento depois, diretamente no banco.
+          </p>
+        }
+      }
+
+      @case ('card') {
+        <div class="eyebrow">Cartão de crédito</div>
+        <h3>Contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</h3>
+
+        <form [formGroup]="cardForm" (ngSubmit)="submitCard()" novalidate>
+          <div class="field" [class.error]="hasCardError('holderName')">
+            <label for="ccard-holder">Nome no cartão</label>
+            <input id="ccard-holder" type="text" formControlName="holderName" autocomplete="cc-name" />
+            <div class="err">Nome como impresso no cartão.</div>
+          </div>
+          <div class="field" [class.error]="hasCardError('number')">
+            <label for="ccard-number">Número do cartão</label>
+            <input id="ccard-number" type="text" formControlName="number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" appMask="cardNumber" maxlength="23" />
+            <div class="err">Número de cartão inválido.</div>
+          </div>
+          <div class="row-2">
+            <div class="field" [class.error]="hasCardError('expiry')">
+              <label for="ccard-exp">Validade</label>
+              <input id="ccard-exp" type="text" formControlName="expiry" inputmode="numeric" placeholder="MM/AA" autocomplete="cc-exp" appMask="expiry" maxlength="5" />
+              <div class="err">Formato MM/AA.</div>
+            </div>
+            <div class="field" [class.error]="hasCardError('ccv')">
+              <label for="ccard-ccv">CVV</label>
+              <input id="ccard-ccv" type="text" formControlName="ccv" inputmode="numeric" autocomplete="cc-csc" placeholder="000" maxlength="4" />
+              <div class="err">3 ou 4 dígitos.</div>
+            </div>
+          </div>
+
+          <div class="field" [class.error]="hasCardError('document')">
+            <label for="ccard-doc">CPF ou CNPJ</label>
+            <input id="ccard-doc" type="text" formControlName="document" inputmode="numeric" placeholder="000.000.000-00" appMask="cpfCnpj" maxlength="18" />
+            <div class="err">CPF (11 dígitos) ou CNPJ (14 dígitos) válido.</div>
+          </div>
+          <div class="field" [class.error]="hasCardError('phone')">
+            <label for="ccard-phone">Celular</label>
+            <input id="ccard-phone" type="tel" formControlName="phone" inputmode="tel" placeholder="(11) 90000-0000" autocomplete="tel" appMask="phone" maxlength="15" />
+            <div class="err">DDD + número.</div>
+          </div>
+          <div class="row-2">
+            <div class="field" [class.error]="hasCardError('postalCode')">
+              <label for="ccard-cep">CEP</label>
+              <input id="ccard-cep" type="text" formControlName="postalCode" inputmode="numeric" placeholder="00000-000" autocomplete="postal-code" appMask="cep" maxlength="9" />
+              <div class="err">CEP inválido.</div>
+            </div>
+            <div class="field" [class.error]="hasCardError('addressNumber')">
+              <label for="ccard-num">Número</label>
+              <input id="ccard-num" type="text" formControlName="addressNumber" inputmode="numeric" />
+              <div class="err">Número do endereço.</div>
+            </div>
+          </div>
+
+          @if (processingError(); as err) {
+            <div class="modal__error">{{ err }}</div>
+          }
+
+          <button type="submit" class="btn btn--solid modal__submit" [disabled]="processing()">
+            {{ processing() ? 'Processando…' : 'Finalizar pagamento' }}
+          </button>
+          <p class="modal__hint">
+            Pagamento processado com segurança pela Asaas. Dados do cartão não são armazenados neste site.
+          </p>
+        </form>
+      }
+
+      @case ('success-card') {
+        <div class="success">
+          <div class="success__claudio">
+            <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
+          </div>
+          <div class="eyebrow">Pagamento aprovado</div>
+          <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+          <p class="success__msg">
+            Sua contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}
+            foi confirmada. Você vai receber o recibo por e-mail em alguns minutos.
+          </p>
+          <button type="button" class="btn btn--solid modal__submit" (click)="close()">Fechar</button>
+        </div>
+      }
+
+      @case ('pending-card') {
+        <div class="success">
+          <div class="success__check success__check--pending">⏳</div>
+          <div class="eyebrow">Em processamento</div>
+          <h3>Recebemos sua solicitação</h3>
+          <p class="success__msg">
+            O pagamento ainda está sendo confirmado pela operadora. Quando for aprovado, você recebe o recibo por e-mail.
+          </p>
+          <button type="button" class="btn btn--solid modal__submit" (click)="close()">Fechar</button>
+        </div>
+      }
+
+      @case ('success-pix') {
+        <div class="success">
+          <div class="success__claudio">
+            <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
+          </div>
+          <div class="eyebrow">Contribuição registrada</div>
+          <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+          <p class="success__msg">
+            Anotamos sua contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}.
+            Os noivos vão confirmar o recebimento no banco — você receberá o e-mail em seguida.
+          </p>
+          <button type="button" class="btn btn--solid modal__submit" (click)="close()">Fechar</button>
+        </div>
+      }
+
+    }
+  </div>
+</div>

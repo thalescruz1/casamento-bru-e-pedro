@@ -1,0 +1,36 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- CS1591: missing XML doc (we don't ship docs) -->
+    <!-- CA1848: LoggerMessage delegates (micro-perf, not a wedding site concern) -->
+    <!-- CA1873: evaluation cost on log args (we use structured logging with simple args) -->
+    <!-- CA1515: public types should not be internal (Functions requires public classes) -->
+    <NoWarn>$(NoWarn);CS1591;CA1848;CA1873;CA1515;CA1716;CA1000</NoWarn>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Thales Cruz</Authors>
+    <Product>Casamento Heloisa &amp; Thales</Product>
+    <Copyright>© 2026 Thales Cruz</Copyright>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,57 @@
+<div class="toolbar">
+  <div class="stats">
+    <div><b>{{ stats().count }}</b> itens recebidos</div>
+    <div><b>{{ stats().gifts }}</b> presentes</div>
+    <div><b>{{ stats().contributions }}</b> valor livre</div>
+    <div><b>{{ stats().pix }}</b> Pix · <b>{{ stats().card }}</b> Cartão</div>
+    <div><b>{{ stats().total | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</b> total</div>
+  </div>
+  <div class="actions">
+    <select (change)="filter.set($any($event.target).value)">
+      <option value="all">Tudo</option>
+      <option value="gift">Só presentes</option>
+      <option value="contribution">Só valor livre</option>
+      <option value="pix">Só Pix</option>
+      <option value="card">Só cartão</option>
+    </select>
+    <button type="button" class="btn" (click)="load()" [disabled]="loading()">↻ Atualizar</button>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="state">Carregando…</div>
+} @else if (error()) {
+  <div class="state state--error">{{ error() }}</div>
+} @else if (filtered().length === 0) {
+  <div class="state">Ninguém contribuiu ainda por aqui — em breve!</div>
+} @else {
+  <table class="received-table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Tipo</th>
+        <th>Item</th>
+        <th>Valor</th>
+        <th>Pagamento</th>
+        <th>Contribuinte</th>
+        <th>Mensagem</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of filtered(); track row.id) {
+        <tr>
+          <td class="nowrap">{{ row.paidAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td><span [class]="typeClass(row.type)">{{ typeLabel(row.type) }}</span></td>
+          <td>{{ row.title }}</td>
+          <td class="amount"><strong>{{ row.amount | currency:row.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</strong></td>
+          <td><span [class]="methodClass(row.paymentMethod)">{{ methodLabel(row.paymentMethod) }}</span></td>
+          <td>
+            <div>{{ row.contributorName || '—' }}</div>
+            <div class="muted">{{ row.contributorEmail || '' }}</div>
+          </td>
+          <td class="message">{{ row.message || '—' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

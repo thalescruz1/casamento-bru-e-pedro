@@ -1,0 +1,31 @@
+<section class="login">
+  <div class="login__card">
+    <a class="login__brand" routerLink="/">
+      <img src="assets/monogram.png" alt="HT monogram" />
+    </a>
+    <div class="eyebrow">Painel do casal</div>
+    <h1>Entrar</h1>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="field">
+        <label for="login-email">E-mail</label>
+        <input id="login-email" type="email" formControlName="email" autocomplete="username" autofocus />
+      </div>
+
+      <div class="field">
+        <label for="login-password">Senha</label>
+        <input id="login-password" type="password" formControlName="password" autocomplete="current-password" />
+      </div>
+
+      @if (error(); as err) {
+        <div class="login__error">{{ err }}</div>
+      }
+
+      <button type="submit" class="btn btn--solid" [disabled]="submitting()">
+        {{ submitting() ? 'Entrando…' : 'Entrar' }}
+      </button>
+    </form>
+
+    <a class="login__back" routerLink="/">← voltar ao site</a>
+  </div>
+</section>

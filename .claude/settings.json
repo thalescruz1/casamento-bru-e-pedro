@@ -1,0 +1,20 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "command": "if [[ $FILE == *.cs ]]; then dotnet format --verify-no-changes $FILE; fi"
+      },
+      {
+        "matcher": "Edit|Write",
+        "command": "if [[ $FILE == *.ts ]]; then npx eslint --fix $FILE; fi"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "command": "echo $COMMAND | grep -E '(git push -f|rm -rf /)' && exit 1 || exit 0"
+      }
+    ]
+  }
+}

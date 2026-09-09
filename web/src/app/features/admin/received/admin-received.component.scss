@@ -1,0 +1,104 @@
+:host { display: block; }
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.stats {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  font-family: var(--serif-body);
+  font-size: 14px;
+  color: var(--ink-soft);
+
+  b { color: var(--ink); font-weight: 500; margin-right: 4px; font-size: 16px; }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  select {
+    font: inherit;
+    font-family: var(--serif);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+  }
+}
+
+.state {
+  text-align: center;
+  font-family: var(--italic);
+  font-style: italic;
+  color: var(--ink-soft);
+  padding: 60px 0;
+
+  &--error { color: #9a4a2f; }
+}
+
+.received-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper);
+  border: 1px solid rgba(20, 17, 13, 0.12);
+  font-family: var(--serif-body);
+
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(20, 17, 13, 0.08);
+    font-size: 14px;
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--paper-2);
+  }
+
+  td.nowrap { white-space: nowrap; }
+  td.amount { white-space: nowrap; color: var(--ink); }
+  td.message {
+    max-width: 320px;
+    font-family: var(--italic);
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .muted { color: var(--ink-mute); font-size: 12px; margin-top: 2px; }
+}
+
+.chip {
+  display: inline-block;
+  font-family: var(--serif);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(20, 17, 13, 0.25);
+  border-radius: 999px;
+  white-space: nowrap;
+
+  &--gift { background: rgba(56, 99, 42, 0.08); color: #38632a; border-color: rgba(56, 99, 42, 0.35); }
+  &--contrib { background: rgba(184, 138, 44, 0.10); color: #8b6613; border-color: rgba(184, 138, 44, 0.4); }
+  &--pix { background: rgba(32, 118, 178, 0.08); color: #1c5a89; border-color: rgba(32, 118, 178, 0.35); }
+  &--card { background: rgba(120, 65, 145, 0.08); color: #6b3a86; border-color: rgba(120, 65, 145, 0.35); }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "casamento-helo-thales",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Site de casamento Helo & Thales — Angular + Azure Functions + Azure SWA.",
+  "scripts": {
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "web:dev": "cd web && ng serve --port 4200",
+    "api:dev": "cd src/Api && func start",
+    "swa:dev": "swa start http://localhost:4200 --api-location src/Api --api-port 7071",
+    "build:web": "cd web && ng build",
+    "build:api": "dotnet build casamento.slnx -c Release",
+    "build": "npm run build:web && npm run build:api",
+    "test": "dotnet test casamento.slnx",
+    "lint:web": "cd web && ng lint"
+  },
+  "devDependencies": {
+    "@azure/static-web-apps-cli": "^2.0.1",
+    "concurrently": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}

@@ -1,0 +1,23 @@
+<section class="count" appReveal>
+  <div class="eyebrow count__label">
+    <span class="rule"></span> &nbsp; Contagem regressiva &nbsp; <span class="rule"></span>
+  </div>
+  <div class="count__grid">
+    <div class="count__cell">
+      <div class="count__num">{{ days() }}</div>
+      <div class="count__unit">Dias</div>
+    </div>
+    <div class="count__cell">
+      <div class="count__num">{{ hours() }}</div>
+      <div class="count__unit">Horas</div>
+    </div>
+    <div class="count__cell">
+      <div class="count__num">{{ minutes() }}</div>
+      <div class="count__unit">Minutos</div>
+    </div>
+    <div class="count__cell">
+      <div class="count__num">{{ seconds() }}</div>
+      <div class="count__unit">Segundos</div>
+    </div>
+  </div>
+</section>
