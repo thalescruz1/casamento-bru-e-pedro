@@ -1,113 +1,78 @@
 :host { display: block; }
 
-.gifts {
-  padding: 140px 32px 120px;
-}
+section { padding: 110px 0; }
 
-.gifts__intro {
-  max-width: 640px;
-  margin: 0 auto 60px;
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+.section-head {
   text-align: center;
+  margin-bottom: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 
   h2 {
     font-family: var(--serif);
     font-weight: 300;
-    font-size: clamp(40px, 5.2vw, 72px);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin: 18px 0 22px;
+    color: var(--blue-deep);
+    font-size: var(--text-3xl);
+    letter-spacing: 0.02em;
+
+    em {
+      font-family: var(--script);
+      font-style: normal;
+      color: var(--blue);
+      font-size: 1.25em;
+    }
   }
-
-  p {
-    font-family: var(--serif-body);
-    font-size: 19px;
-    line-height: 1.75;
-    color: var(--ink-soft);
-
-    em { font-family: var(--italic); font-style: italic; color: var(--ink); }
+  .head-rule {
+    width: 1px;
+    height: 48px;
+    background: var(--blue);
+    opacity: 0.5;
+    margin-top: 10px;
   }
 }
 
 .gifts__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1080px;
-  margin: 0 auto;
-
-  &--two {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 780px;
-  }
+  display: flex;
+  justify-content: center;
 }
 
-.gifts__single {
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-.gift {
-  border: 1px solid rgba(20, 17, 13, 0.18);
-  padding: 40px 28px;
+.gifts__card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  padding: 44px 40px;
+  max-width: 560px;
   text-align: center;
-  background: var(--paper);
-  transition: transform 0.3s ease, border-color 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  min-height: 320px;
-
-  &:hover {
-    transform: translateY(-4px);
-    border-color: var(--ink);
-  }
+  gap: 16px;
 }
 
-.gift__num {
-  font-family: var(--italic);
-  font-style: italic;
-  font-size: 16px;
-  color: var(--ink-mute);
-  margin-bottom: 18px;
+.gifts__card-title {
+  font-family: var(--script);
+  font-size: 72px;
+  color: var(--blue);
+  line-height: 1;
 }
 
-.gift__title {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 28px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-}
-
-.gift__desc {
-  font-family: var(--serif-body);
-  font-size: 17px;
-  line-height: 1.75;
+.gifts__card-desc {
   color: var(--ink-soft);
-  margin-bottom: 22px;
+  max-width: 460px;
+
+  em { font-family: var(--serif); font-style: italic; color: var(--blue-deep); }
 }
 
-.gift__link {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--ink);
-  padding-bottom: 4px;
-  color: var(--ink);
-}
-
-@media (max-width: 900px) {
-  .gifts__grid,
-  .gifts__grid--two {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+.btn {
+  border-radius: 999px;
+  margin-top: 6px;
 }
 
 @media (max-width: 560px) {
-  .gifts { padding-left: 22px; padding-right: 22px; }
+  section { padding: 70px 0; }
+  .gifts__card { padding: 32px 24px; }
+  .gifts__card-title { font-size: 58px; }
 }

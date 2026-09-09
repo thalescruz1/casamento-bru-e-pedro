@@ -1,26 +1,20 @@
-<nav class="nav" [class.scrolled]="scrolled()">
-  <a class="nav__brand" href="#top" (click)="goTo($event, 'top')">
-    <img src="assets/monogram-small.png" alt="HT monogram" />
-    <span class="names">Heloisa &amp; Thales</span>
+<nav class="nav" [class.is-scrolled]="scrolled()">
+  <a href="#top" class="nav-mark" (click)="goTo($event, 'top')" aria-label="Início">
+    <img src="assets/bp/images/monogram.png" alt="Monograma B e P" />
   </a>
-  <div class="nav__links">
-    <a href="#cerimonia" (click)="goTo($event, 'cerimonia')" [class.active]="activeSection() === 'cerimonia'">Cerimônia</a>
-    <a href="#local" (click)="goTo($event, 'local')" [class.active]="activeSection() === 'local'">Local</a>
-    <a href="#presentes" (click)="goTo($event, 'presentes')" [class.active]="activeSection() === 'presentes'">Presentes</a>
-    <a href="#hospedagem" (click)="goTo($event, 'hospedagem')" [class.active]="activeSection() === 'hospedagem'">Hospedagem</a>
-    <a href="#faq" (click)="goTo($event, 'faq')" [class.active]="activeSection() === 'faq'">FAQ</a>
-  </div>
-  <a class="nav__cta" href="#rsvp" (click)="goTo($event, 'rsvp')">Confirmar presença</a>
-  <button class="nav__burger" aria-label="menu" (click)="toggleMobile()">
+  <button type="button" class="nav-toggle" (click)="toggleMobile()" [attr.aria-expanded]="mobileOpen()" aria-label="Abrir menu">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
-<div class="mobile-menu" [class.open]="mobileOpen()">
-  <a href="#cerimonia" (click)="goTo($event, 'cerimonia', true)">Cerimônia</a>
-  <a href="#local" (click)="goTo($event, 'local', true)">Local</a>
-  <a href="#presentes" (click)="goTo($event, 'presentes', true)">Presentes</a>
-  <a href="#hospedagem" (click)="goTo($event, 'hospedagem', true)">Hospedagem</a>
-  <a href="#faq" (click)="goTo($event, 'faq', true)">FAQ</a>
-  <a class="nav__cta" href="#rsvp" (click)="goTo($event, 'rsvp', true)">Confirmar presença</a>
+<div class="menu-overlay" [class.is-open]="mobileOpen()">
+  <button type="button" class="menu-close" (click)="toggleMobile()" aria-label="Fechar menu">×</button>
+  <ul class="menu-list">
+    <li><a href="#top" (click)="goTo($event, 'top', true)">Início</a></li>
+    <li><a href="#contagem" (click)="goTo($event, 'contagem', true)">Contagem</a></li>
+    <li><a href="#evento" (click)="goTo($event, 'evento', true)">O evento</a></li>
+    <li><a href="#traje" (click)="goTo($event, 'traje', true)">Traje</a></li>
+    <li><a href="#presentes" (click)="goTo($event, 'presentes', true)">Presentes</a></li>
+    <li><a href="#rsvp" (click)="goTo($event, 'rsvp', true)">Confirmar presença</a></li>
+  </ul>
 </div>

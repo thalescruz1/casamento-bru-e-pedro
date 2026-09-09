@@ -1,42 +1,33 @@
 :host { display: block; }
 
 footer {
+  padding: 70px 24px 60px;
   text-align: center;
-  padding: 90px 32px 60px;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--paper-deep);
 
-  img {
-    width: 60px;
-    height: auto;
-    margin: 0 auto 24px;
-    filter: invert(1) brightness(1.1);
-  }
+  img { width: 56px; margin: 0 auto 14px; }
 
-  .names {
-    font-family: var(--serif);
-    font-weight: 300;
-    font-size: clamp(26px, 3.4vw, 38px);
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
+  .script {
+    font-family: var(--script);
+    color: var(--blue);
+    font-size: 46px;
+    line-height: 1;
     margin-bottom: 12px;
   }
 
-  .date {
-    font-family: var(--italic);
-    font-style: italic;
-    font-size: 18px;
-    letter-spacing: 0.06em;
-    color: rgba(242, 237, 228, 0.85);
-    margin-bottom: 36px;
+  .foot-date {
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 22px;
   }
 
-  .small {
+  .foot-tiny {
     font-family: var(--serif);
-    font-weight: 500;
-    font-size: 12px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(242, 237, 228, 0.6);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
   }
 }

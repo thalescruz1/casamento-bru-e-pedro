@@ -5,8 +5,8 @@
     @switch (step()) {
 
       @case ('info') {
-        <div class="eyebrow">Contribuição em valor livre</div>
-        <h3>Defina sua contribuição</h3>
+        <p class="eyebrow">Contribuição em valor livre</p>
+        <h3>Defina sua <span class="script-em">contribuição</span></h3>
         <p class="modal__hint">
           Escolha um valor (mínimo R$ 5) e os mesmos dados de Pix ou cartão dos presentes valem aqui.
         </p>
@@ -38,7 +38,7 @@
       }
 
       @case ('method') {
-        <div class="eyebrow">Como deseja pagar?</div>
+        <p class="eyebrow">Como deseja pagar?</p>
         <h3>Contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</h3>
 
         <div class="method-grid">
@@ -64,7 +64,7 @@
       }
 
       @case ('pix') {
-        <div class="eyebrow">Pague com Pix</div>
+        <p class="eyebrow">Pague com Pix</p>
         <h3>Contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</h3>
 
         @if (pixInfo(); as pix) {
@@ -121,7 +121,7 @@
       }
 
       @case ('card') {
-        <div class="eyebrow">Cartão de crédito</div>
+        <p class="eyebrow">Cartão de crédito</p>
         <h3>Contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}</h3>
 
         <form [formGroup]="cardForm" (ngSubmit)="submitCard()" novalidate>
@@ -186,11 +186,9 @@
 
       @case ('success-card') {
         <div class="success">
-          <div class="success__claudio">
-            <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
-          </div>
-          <div class="eyebrow">Pagamento aprovado</div>
-          <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+          <img class="success__mono" src="assets/bp/images/monogram.png" alt="Monograma Bruna e Pedro" />
+          <p class="eyebrow">Pagamento aprovado</p>
+          <h3 class="script">Obrigado!</h3>
           <p class="success__msg">
             Sua contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}
             foi confirmada. Você vai receber o recibo por e-mail em alguns minutos.
@@ -202,8 +200,8 @@
       @case ('pending-card') {
         <div class="success">
           <div class="success__check success__check--pending">⏳</div>
-          <div class="eyebrow">Em processamento</div>
-          <h3>Recebemos sua solicitação</h3>
+          <p class="eyebrow">Em processamento</p>
+          <h3 class="script">Recebemos!</h3>
           <p class="success__msg">
             O pagamento ainda está sendo confirmado pela operadora. Quando for aprovado, você recebe o recibo por e-mail.
           </p>
@@ -213,11 +211,9 @@
 
       @case ('success-pix') {
         <div class="success">
-          <div class="success__claudio">
-            <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
-          </div>
-          <div class="eyebrow">Contribuição registrada</div>
-          <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+          <img class="success__mono" src="assets/bp/images/monogram.png" alt="Monograma Bruna e Pedro" />
+          <p class="eyebrow">Contribuição registrada</p>
+          <h3 class="script">Obrigado!</h3>
           <p class="success__msg">
             Anotamos sua contribuição de {{ amountValue() | currency:'BRL':'symbol-narrow':'1.2-2':'pt-BR' }}.
             Os noivos vão confirmar o recebimento no banco — você receberá o e-mail em seguida.

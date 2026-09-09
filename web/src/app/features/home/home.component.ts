@@ -2,13 +2,10 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { NavComponent } from './sections/nav.component';
 import { HeroComponent } from './sections/hero.component';
 import { CountdownComponent } from './sections/countdown.component';
-import { InviteComponent } from './sections/invite.component';
 import { EventsComponent } from './sections/events.component';
-import { VenueComponent } from './sections/venue.component';
-import { RsvpFormComponent } from './sections/rsvp-form.component';
+import { TrajeComponent } from './sections/traje.component';
 import { GiftsTeaserComponent } from './sections/gifts-teaser.component';
-import { StayComponent } from './sections/stay.component';
-import { FaqComponent } from './sections/faq.component';
+import { RsvpFormComponent } from './sections/rsvp-form.component';
 import { FooterComponent } from './sections/footer.component';
 
 @Component({
@@ -17,27 +14,21 @@ import { FooterComponent } from './sections/footer.component';
     NavComponent,
     HeroComponent,
     CountdownComponent,
-    InviteComponent,
     EventsComponent,
-    VenueComponent,
-    RsvpFormComponent,
+    TrajeComponent,
     GiftsTeaserComponent,
-    StayComponent,
-    FaqComponent,
+    RsvpFormComponent,
     FooterComponent
   ],
   template: `
     <app-nav />
-    <main id="top">
+    <main>
       <app-hero />
       <app-countdown />
-      <app-invite />
       <app-events />
-      <app-venue />
-      <app-rsvp-form />
+      <app-traje />
       <app-gifts-teaser />
-      <app-stay />
-      <app-faq />
+      <app-rsvp-form />
     </main>
     <app-footer />
   `,

@@ -15,7 +15,7 @@ public sealed class WeddingEmailOptions
 {
     public const string SectionName = "WeddingEmail";
 
-    public string CoupleName { get; set; } = "Helô & Thales";
+    public string CoupleName { get; set; } = "Bruna & Pedro";
 
     public IReadOnlyList<CoupleRecipient> Couple { get; set; } = Array.Empty<CoupleRecipient>();
 

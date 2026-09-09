@@ -105,7 +105,7 @@ public sealed class CheckoutContributionCardHandler(
                     GuestName: request.ContributorName,
                     GuestEmail: request.ContributorEmail,
                     GuestDocument: request.ContributorDocument,
-                    Description: $"Contribuição casamento Helo & Thales",
+                    Description: $"Contribuição casamento Bruna & Pedro",
                     DueDate: now.AddDays(1),
                     RemoteIp: request.IpHash,
                     Card: new CreditCardData(

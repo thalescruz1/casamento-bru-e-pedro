@@ -1,20 +1,19 @@
 <header class="gp__header">
   <a class="gp__back" routerLink="/">← voltar</a>
   <a class="gp__brand" routerLink="/">
-    <img src="assets/monogram-small.png" alt="HT monogram" />
-    <span>Heloisa &amp; Thales</span>
+    <img src="assets/bp/images/monogram.png" alt="Monograma B e P" />
+    <span class="script">Bruna e Pedro</span>
   </a>
   <span class="gp__spacer"></span>
 </header>
 
 <section class="gp__intro">
-  <div class="eyebrow"><span class="rule"></span> &nbsp; Lista de presentes &nbsp; <span class="rule"></span></div>
-  <h1>Um brinde<br/>ao que vem.</h1>
+  <p class="eyebrow">Lista de presentes</p>
+  <h1>Um brinde ao <em>que vem</em></h1>
+  <div class="head-rule"></div>
   <p>
     Sua presença já é o nosso maior presente. Para quem desejar ir além, escolhemos, com carinho,
-    estas <em>opções.</em> Logo depois do casamento, partimos para a nossa lua de mel em
-    <em>Florença</em>, e cada contribuição vai com a gente nessa viagem — pague com <em>Pix</em> ou
-    <em>cartão de crédito</em>.
+    estas <em>opções</em>. Pague com <em>Pix</em> ou <em>cartão de crédito</em>.
   </p>
 </section>
 
@@ -26,12 +25,14 @@
   <div class="gp__state">A lista está sendo preparada — volte em breve.</div>
 } @else {
   <section class="gp__contribution-card">
-    <div class="gp__contribution-card-inner">
-      <div class="eyebrow">Contribuição em valor livre</div>
-      <p class="gp__contribution-text">
-        Temos várias opções de presentes abaixo, mas caso prefira, você pode contribuir
-        aqui com qualquer outro valor que faça sentido para você!
-      </p>
+    <div class="gp__contribution-inner">
+      <div class="gp__contribution-copy">
+        <p class="eyebrow">Contribuição em valor livre</p>
+        <p class="gp__contribution-text">
+          Temos várias opções de presentes abaixo, mas caso prefira, você pode contribuir
+          aqui com qualquer outro valor que faça sentido para você.
+        </p>
+      </div>
       <button type="button" class="btn btn--solid" (click)="openContributionModal()">Contribuir ↗</button>
     </div>
   </section>
@@ -57,31 +58,31 @@
   </section>
 
   @if (visibleGifts().length === 0) {
-    <div class="gp__state">Nenhum presente nessa faixa de preço. Tente outra opção.</div>
+    <div class="gp__state">Nenhum presente nessa faixa. Tente outra opção.</div>
   } @else {
-  <section class="gp__grid">
-    @for (gift of visibleGifts(); track gift.id) {
-      <article class="gift" [class.gift--taken]="gift.status !== AvailableStatus">
-        <div class="gift__img">
-          @if (gift.imageUrl) {
-            <img [src]="gift.imageUrl" [alt]="gift.title" loading="lazy" />
-          } @else {
-            <div class="gift__img-placeholder">HT</div>
-          }
-        </div>
-        <div class="gift__body">
-          <h3 class="gift__title">{{ gift.title }}</h3>
-          <p class="gift__desc">{{ gift.description }}</p>
-          <div class="gift__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</div>
-          @if (gift.status === AvailableStatus) {
-            <button type="button" class="btn btn--solid" (click)="openModal(gift)">Presentear</button>
-          } @else {
-            <span class="gift__taken">Esgotado</span>
-          }
-        </div>
-      </article>
-    }
-  </section>
+    <section class="gp__grid">
+      @for (gift of visibleGifts(); track gift.id) {
+        <article class="gift" [class.gift--taken]="gift.status !== AvailableStatus">
+          <div class="gift__img">
+            @if (gift.imageUrl) {
+              <img [src]="gift.imageUrl" [alt]="gift.title" loading="lazy" />
+            } @else {
+              <div class="gift__img-placeholder">BP</div>
+            }
+          </div>
+          <div class="gift__body">
+            <h3 class="gift__title">{{ gift.title }}</h3>
+            <p class="gift__desc">{{ gift.description }}</p>
+            <div class="gift__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</div>
+            @if (gift.status === AvailableStatus) {
+              <button type="button" class="btn btn--solid" (click)="openModal(gift)">Presentear</button>
+            } @else {
+              <span class="gift__taken">Esgotado</span>
+            }
+          </div>
+        </article>
+      }
+    </section>
   }
 }
 
@@ -97,7 +98,7 @@
       @switch (step()) {
 
         @case ('info') {
-          <div class="eyebrow">Presentear</div>
+          <p class="eyebrow">Presentear</p>
           <h3>{{ gift.title }}</h3>
           <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
 
@@ -123,7 +124,7 @@
         }
 
         @case ('method') {
-          <div class="eyebrow">Como deseja pagar?</div>
+          <p class="eyebrow">Como deseja pagar?</p>
           <h3>{{ gift.title }}</h3>
           <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
 
@@ -143,14 +144,13 @@
           @if (processingError(); as err) {
             <div class="modal__error">{{ err }}</div>
           }
-
           @if (processing()) {
             <p class="modal__hint">Carregando…</p>
           }
         }
 
         @case ('pix') {
-          <div class="eyebrow">Pague com Pix</div>
+          <p class="eyebrow">Pague com Pix</p>
           <h3>{{ gift.title }}</h3>
           <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
 
@@ -201,14 +201,14 @@
               {{ processing() ? 'Registrando…' : 'Já paguei — reservar presente' }}
             </button>
             <p class="modal__hint">
-              Ao clicar em “Já paguei”, o presente é reservado pra você e enviaremos um e-mail de confirmação.
+              Ao clicar em "Já paguei", o presente é reservado pra você e enviaremos um e-mail de confirmação.
               Os noivos confirmam o recebimento depois, diretamente no banco.
             </p>
           }
         }
 
         @case ('card') {
-          <div class="eyebrow">Cartão de crédito</div>
+          <p class="eyebrow">Cartão de crédito</p>
           <h3>{{ gift.title }}</h3>
           <p class="modal__price">{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</p>
 
@@ -274,11 +274,9 @@
 
         @case ('success-card') {
           <div class="success">
-            <div class="success__claudio">
-              <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
-            </div>
-            <div class="eyebrow">Pagamento aprovado</div>
-            <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+            <img class="success__mono" src="assets/bp/images/monogram.png" alt="Monograma Bruna e Pedro" />
+            <p class="eyebrow">Pagamento aprovado</p>
+            <h3 class="script">Obrigado!</h3>
             <p class="success__msg">
               Sua contribuição <em>{{ gift.title }}</em> ({{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }})
               foi confirmada. Você vai receber o recibo por e-mail em alguns minutos.
@@ -290,8 +288,8 @@
         @case ('pending-card') {
           <div class="success">
             <div class="success__check success__check--pending">⏳</div>
-            <div class="eyebrow">Em processamento</div>
-            <h3>Recebemos sua solicitação</h3>
+            <p class="eyebrow">Em processamento</p>
+            <h3 class="script">Recebemos!</h3>
             <p class="success__msg">
               O pagamento ainda está sendo confirmado pela operadora. Quando for aprovado, você recebe o recibo por e-mail.
             </p>
@@ -301,18 +299,15 @@
 
         @case ('success-pix') {
           <div class="success">
-            <div class="success__claudio">
-              <img src="assets/claudio-photo.jpg" alt="Cláudio agradece" />
-            </div>
-            <div class="eyebrow">Presente reservado</div>
-            <h3>Obrigado, {{ buyerForm.controls.name.value }}!</h3>
+            <img class="success__mono" src="assets/bp/images/monogram.png" alt="Monograma Bruna e Pedro" />
+            <p class="eyebrow">Presente reservado</p>
+            <h3 class="script">Obrigado!</h3>
             <p class="success__msg">
               Anotamos seu Pix de <em>{{ gift.title }}</em>. Os noivos vão confirmar o recebimento no banco — você receberá o e-mail em seguida.
             </p>
             <button type="button" class="btn btn--solid modal__submit" (click)="closeModal()">Fechar</button>
           </div>
         }
-
       }
     </div>
   </div>

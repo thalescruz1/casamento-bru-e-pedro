@@ -1,23 +1,14 @@
-<section class="count" appReveal>
-  <div class="eyebrow count__label">
-    <span class="rule"></span> &nbsp; Contagem regressiva &nbsp; <span class="rule"></span>
-  </div>
-  <div class="count__grid">
-    <div class="count__cell">
-      <div class="count__num">{{ days() }}</div>
-      <div class="count__unit">Dias</div>
+<section class="tint" id="contagem" appReveal>
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Falta pouco</p>
+      <h2>Contagem <em>regressiva</em></h2>
     </div>
-    <div class="count__cell">
-      <div class="count__num">{{ hours() }}</div>
-      <div class="count__unit">Horas</div>
-    </div>
-    <div class="count__cell">
-      <div class="count__num">{{ minutes() }}</div>
-      <div class="count__unit">Minutos</div>
-    </div>
-    <div class="count__cell">
-      <div class="count__num">{{ seconds() }}</div>
-      <div class="count__unit">Segundos</div>
+    <div class="countdown">
+      <div class="cd-tile"><div class="cd-num">{{ tiles().days }}</div><div class="cd-base">Dias</div></div>
+      <div class="cd-tile"><div class="cd-num">{{ tiles().hours }}</div><div class="cd-base">Horas</div></div>
+      <div class="cd-tile"><div class="cd-num">{{ tiles().minutes }}</div><div class="cd-base">Minutos</div></div>
+      <div class="cd-tile"><div class="cd-num">{{ tiles().seconds }}</div><div class="cd-base">Segundos</div></div>
     </div>
   </div>
 </section>

@@ -11,7 +11,7 @@ export class NavComponent {
   readonly mobileOpen = signal(false);
   readonly activeSection = signal<string>('');
 
-  private readonly trackedSections = ['cerimonia', 'local', 'presentes', 'hospedagem', 'faq'];
+  private readonly trackedSections = ['contagem', 'evento', 'traje', 'presentes', 'rsvp'];
 
   @HostListener('window:scroll')
   onScroll(): void {

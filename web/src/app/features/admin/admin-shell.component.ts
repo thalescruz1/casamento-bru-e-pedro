@@ -8,7 +8,7 @@ import { AuthService } from '../../core/auth/auth.service';
   template: `
     <header class="admin-top">
       <div>
-        <h1>Painel · Helo &amp; Thales</h1>
+        <h1>Painel · Bruna &amp; Pedro</h1>
         @if (auth.currentUser(); as user) {
           <p class="who">
             Olá, {{ user.displayName }} — <button type="button" (click)="logout()">sair</button>

@@ -14,7 +14,7 @@ public sealed class AcsEmailOptions
     [EmailAddress]
     public string SenderAddress { get; set; } = string.Empty;
 
-    public string SenderDisplayName { get; set; } = "Helô & Thales";
+    public string SenderDisplayName { get; set; } = "Bruna & Pedro";
 }
 
 internal sealed class AcsEmailOptionsValidator : IValidateOptions<AcsEmailOptions>

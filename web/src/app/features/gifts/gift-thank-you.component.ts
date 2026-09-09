@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <section class="thank">
-      <img src="assets/monogram.png" alt="HT monogram" class="thank__mono" />
+      <img src="assets/bp/images/monogram.png" alt="Monograma Bruna e Pedro" class="thank__mono" />
       <div class="eyebrow">Recebido</div>
       <h1>Obrigado pelo<br/>carinho.</h1>
       <p>

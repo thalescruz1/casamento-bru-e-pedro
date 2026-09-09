@@ -96,7 +96,7 @@ public sealed class CheckoutCardHandler(
                     GuestName: request.BuyerName,
                     GuestEmail: request.BuyerEmail,
                     GuestDocument: request.BuyerDocument,
-                    Description: $"Presente de casamento Helo & Thales — {gift.Title}",
+                    Description: $"Presente de casamento Bruna & Pedro — {gift.Title}",
                     DueDate: now.AddDays(1),
                     RemoteIp: request.IpHash,
                     Card: new CreditCardData(

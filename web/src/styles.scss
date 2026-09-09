@@ -1,72 +1,114 @@
-:root {
-  --paper: #f2ede4;
-  --paper-2: #ece6db;
-  --paper-3: #e6dfd2;
-  --ink: #14110d;
-  --ink-soft: #3a342c;
-  --ink-mute: #6b6458;
-  --rule: #1a1712;
-  --serif: "Cormorant Garamond", "Cardo", Georgia, serif;
-  --serif-body: "Cormorant Garamond", "Cardo", Georgia, serif;
-  --italic: "Cormorant Infant", "Cardo", Georgia, serif;
+/* ─── Fontes (Allura + Cormorant + Karla, hospedadas localmente) ────────── */
+@font-face {
+  font-family: 'Allura'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/assets/bp/fonts/5415fa7c.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant'; font-style: normal; font-weight: 300; font-display: swap;
+  src: url('/assets/bp/fonts/1fda2b9f.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/assets/bp/fonts/1fda2b9f.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('/assets/bp/fonts/1fda2b9f.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant'; font-style: italic; font-weight: 400; font-display: swap;
+  src: url('/assets/bp/fonts/e613d8e7.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Karla'; font-style: normal; font-weight: 300; font-display: swap;
+  src: url('/assets/bp/fonts/aec2cb7b.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Karla'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/assets/bp/fonts/aec2cb7b.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Karla'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('/assets/bp/fonts/aec2cb7b.woff2') format('woff2');
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ─── Paleta e variáveis (Bruna & Pedro — azul) ─────────────────────────── */
+:root {
+  --paper: #f5f3ee;
+  --paper-deep: #ece9e1;
+  --white: #fffdf9;
+  --sky: #dce8f3;
+  --powder: #b9d2ea;
+  --blue: #3b7ab8;
+  --blue-deep: #2b5f95;
+  --blue-ink: #1f4570;
+  --ink: #2a2a2e;
+  --ink-soft: #5f6068;
+  --line: #cfd9e3;
+  --green: #8aa66b;
+  --terracotta: #c99a6c;
+
+  /* Aliases semânticos usados pelos componentes portados */
+  --paper-2: var(--paper-deep);
+  --paper-3: var(--sky);
+  --ink-mute: var(--ink-soft);
+  --rule: var(--blue-deep);
+
+  --serif: 'Cormorant', 'Cormorant Garamond', Georgia, serif;
+  --serif-body: 'Cormorant', 'Cormorant Garamond', Georgia, serif;
+  --italic: 'Cormorant', 'Cormorant Infant', Georgia, serif;
+  --script: 'Allura', 'Cormorant', cursive;
+  --body: 'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --font-script: var(--script);
+  --font-display: var(--serif);
+  --font-body: var(--body);
+
+  --text-xs: 12px; --text-sm: 14px; --text-base: 17px; --text-lg: 22px;
+  --text-xl: 30px; --text-2xl: 44px;
+  --text-3xl: clamp(36px, 5vw, 54px);
+  --text-script-hero: clamp(64px, 12vw, 140px);
 }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--serif-body);
-  font-weight: 500;
+  font-family: var(--body);
+  font-weight: 300;
 }
 
 body {
-  font-size: 21px;
-  line-height: 1.6;
-  -webkit-font-smoothing: subpixel-antialiased;
-  -moz-osx-font-smoothing: auto;
+  font-size: 17px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1, "liga" 1;
   overflow-x: hidden;
-  background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.35), transparent 50%),
-    radial-gradient(ellipse at 100% 100%, rgba(0, 0, 0, 0.03), transparent 50%);
 }
 
-img {
-  max-width: 100%;
-  display: block;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
 button {
-  font: inherit;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
+  font: inherit; color: inherit;
+  background: transparent; border: 0; cursor: pointer;
 }
 
+/* Utilitários compartilhados com o design canônico do B&P */
+.script { font-family: var(--script); font-weight: 400; }
 .display { font-family: var(--serif); font-weight: 300; letter-spacing: 0.01em; }
-.italic { font-family: var(--italic); font-style: italic; font-weight: 300; }
-.amp-italic { font-family: var(--italic); font-style: italic; font-weight: 300; }
+.italic { font-family: var(--italic); font-style: italic; font-weight: 400; }
 .center { text-align: center; }
 
 .eyebrow {
   font-family: var(--serif);
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.32em;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.36em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--blue-deep);
   white-space: nowrap;
 }
 
@@ -74,12 +116,12 @@ button {
   display: inline-block;
   width: 48px;
   height: 1px;
-  background: var(--ink);
+  background: var(--blue-deep);
   vertical-align: middle;
 }
 
 @media (max-width: 560px) {
-  .eyebrow { font-size: 12px; letter-spacing: 0.24em; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.28em; }
   .rule { width: 32px; }
 }
 
@@ -90,36 +132,33 @@ button {
   letter-spacing: 0.26em;
   text-transform: uppercase;
   padding: 14px 26px;
-  border: 1px solid var(--ink);
-  color: var(--ink);
-  transition: all 0.2s;
+  border: 1px solid var(--blue-deep);
+  color: var(--blue-deep);
+  transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
   gap: 10px;
   background: transparent;
   cursor: pointer;
 
-  &:hover { background: var(--ink); color: var(--paper); }
+  &:hover { background: var(--blue-deep); color: var(--white); }
 
   &--solid {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--blue-deep);
+    color: var(--white);
 
-    &:hover { background: transparent; color: var(--ink); }
+    &:hover { background: var(--blue-ink); color: var(--white); border-color: var(--blue-ink); }
   }
 }
 
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 1.1s ease-out, transform 1.1s ease-out;
+  transform: translateY(24px);
+  transition: opacity 1.0s ease-out, transform 1.0s ease-out;
 
-  &.in {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  &.in { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 560px) {
-  body { font-size: 18px; }
+  body { font-size: 17px; }
 }

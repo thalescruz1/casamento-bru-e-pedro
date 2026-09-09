@@ -1,5 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { interval, startWith } from 'rxjs';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
+
+const TARGET = new Date('2027-02-12T15:00:00-03:00').getTime();
+const pad = (n: number) => n.toString().padStart(2, '0');
 
 @Component({
   selector: 'app-countdown',
@@ -8,34 +13,26 @@ import { RevealDirective } from '../../../shared/directives/reveal.directive';
   styleUrl: './countdown.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CountdownComponent implements OnInit, OnDestroy {
-  readonly days = signal('—');
-  readonly hours = signal('—');
-  readonly minutes = signal('—');
-  readonly seconds = signal('—');
-
-  private readonly target = new Date('2026-08-08T15:00:00-03:00').getTime();
-  private intervalId?: ReturnType<typeof setInterval>;
+export class CountdownComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  readonly tiles = signal({ days: '00', hours: '00', minutes: '00', seconds: '00' });
 
   ngOnInit(): void {
-    this.tick();
-    this.intervalId = setInterval(() => this.tick(), 1000);
+    interval(1000)
+      .pipe(startWith(0), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.update());
   }
 
-  ngOnDestroy(): void {
-    if (this.intervalId) { clearInterval(this.intervalId); }
-  }
-
-  private tick(): void {
-    const diff = this.target - Date.now();
+  private update(): void {
+    const diff = TARGET - Date.now();
     if (diff <= 0) {
-      this.days.set('00'); this.hours.set('00'); this.minutes.set('00'); this.seconds.set('00');
+      this.tiles.set({ days: '00', hours: '00', minutes: '00', seconds: '00' });
       return;
     }
-    const pad = (n: number) => String(Math.max(0, n)).padStart(2, '0');
-    this.days.set(pad(Math.floor(diff / 86_400_000)));
-    this.hours.set(pad(Math.floor(diff / 3_600_000) % 24));
-    this.minutes.set(pad(Math.floor(diff / 60_000) % 60));
-    this.seconds.set(pad(Math.floor(diff / 1000) % 60));
+    const days = Math.floor(diff / 86_400_000);
+    const hours = Math.floor(diff / 3_600_000) % 24;
+    const minutes = Math.floor(diff / 60_000) % 60;
+    const seconds = Math.floor(diff / 1_000) % 60;
+    this.tiles.set({ days: pad(days), hours: pad(hours), minutes: pad(minutes), seconds: pad(seconds) });
   }
 }

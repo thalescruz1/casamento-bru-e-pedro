@@ -5,17 +5,17 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
-    title: 'Heloisa & Thales — 08.08.26'
+    title: 'Bruna & Pedro — 12.02.27'
   },
   {
     path: 'presentes',
     loadComponent: () => import('./features/gifts/gifts-page.component').then(m => m.GiftsPageComponent),
-    title: 'Presentes — Heloisa & Thales'
+    title: 'Presentes — Bruna & Pedro'
   },
   {
     path: 'presentes/obrigado',
     loadComponent: () => import('./features/gifts/gift-thank-you.component').then(m => m.GiftThankYouComponent),
-    title: 'Obrigado — Heloisa & Thales'
+    title: 'Obrigado — Bruna & Pedro'
   },
   {
     path: 'admin/login',
