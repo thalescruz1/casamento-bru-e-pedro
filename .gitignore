@@ -58,3 +58,5 @@ logs/
 /assets/
 .swa-env-prod
 .swa-env-hml
+.swa-env-bp-prod
+.swa-env-*
