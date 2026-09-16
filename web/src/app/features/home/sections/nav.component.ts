@@ -11,11 +11,11 @@ export class NavComponent {
   readonly mobileOpen = signal(false);
   readonly activeSection = signal<string>('');
 
-  private readonly trackedSections = ['contagem', 'evento', 'traje', 'presentes', 'rsvp'];
+  private readonly trackedSections = ['contagem', 'evento', 'local', 'traje', 'hospedagem', 'presentes', 'rsvp'];
 
   @HostListener('window:scroll')
   onScroll(): void {
-    this.scrolled.set(window.scrollY > 40);
+    this.scrolled.set(window.scrollY > window.innerHeight * 0.7);
     for (const id of this.trackedSections) {
       const el = document.getElementById(id);
       if (!el) { continue; }

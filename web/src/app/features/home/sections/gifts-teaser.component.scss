@@ -2,11 +2,13 @@
 
 section { padding: 110px 0; }
 
+.tint { background: var(--sky); }
+
 .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
 .section-head {
   text-align: center;
-  margin-bottom: 44px;
+  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,44 +37,38 @@ section { padding: 110px 0; }
   }
 }
 
-.gifts__grid {
+.section-lead {
+  max-width: 640px;
+  margin: 0 auto 48px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.gift-cta {
   display: flex;
   justify-content: center;
+  margin-top: 8px;
 }
 
-.gifts__card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  padding: 44px 40px;
-  max-width: 560px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.gifts__card-title {
-  font-family: var(--script);
-  font-size: 72px;
-  color: var(--blue);
-  line-height: 1;
-}
-
-.gifts__card-desc {
-  color: var(--ink-soft);
-  max-width: 460px;
-
-  em { font-family: var(--serif); font-style: italic; color: var(--blue-deep); }
-}
-
-.btn {
+.gift-link {
+  display: inline-block;
+  border: 1px solid var(--blue-deep);
   border-radius: 999px;
-  margin-top: 6px;
+  color: var(--blue-deep);
+  padding: 17px 40px;
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.3s ease, color 0.3s ease;
+
+  &:hover { background: var(--blue-deep); color: var(--white); }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 720px) {
   section { padding: 70px 0; }
-  .gifts__card { padding: 32px 24px; }
-  .gifts__card-title { font-size: 58px; }
 }

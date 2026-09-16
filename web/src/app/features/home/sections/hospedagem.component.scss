@@ -1,0 +1,197 @@
+:host { display: block; }
+
+section { padding: 110px 0; }
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+.section-head {
+  text-align: center;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 300;
+    color: var(--blue-deep);
+    font-size: var(--text-3xl);
+    letter-spacing: 0.02em;
+
+    em {
+      font-family: var(--script);
+      font-style: normal;
+      color: var(--blue);
+      font-size: 1.25em;
+    }
+  }
+  .head-rule {
+    width: 1px;
+    height: 48px;
+    background: var(--blue);
+    opacity: 0.5;
+    margin-top: 10px;
+  }
+}
+
+.section-lead {
+  max-width: 640px;
+  margin: 0 auto 48px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 32px;
+  align-items: stretch;
+}
+
+.info-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 50% 50% 4px 4px / 24% 24% 4px 4px;
+  padding: 92px 46px 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  > .eyebrow, > h3, > .info-note { text-align: center; }
+  > .info-note { margin-left: auto; margin-right: auto; max-width: 18em; }
+  > .eyebrow { margin-bottom: 10px; }
+
+  h3 {
+    font-family: var(--serif);
+    font-weight: 300;
+    color: var(--blue-deep);
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+  }
+
+  &.hotel-card {
+    border-color: var(--blue-deep);
+
+    h3 { max-width: none; line-height: 1.15; margin-bottom: 8px; }
+  }
+}
+
+.hotel-link {
+  color: var(--blue-deep);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.3s ease, border-color 0.3s ease;
+
+  &:hover { color: var(--blue); border-bottom-color: currentColor; }
+}
+
+.info-note {
+  font-family: var(--script);
+  font-size: 26px;
+  line-height: 1.35;
+  color: var(--blue);
+  margin-bottom: 22px;
+}
+
+.info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+
+    &:last-child { border-bottom: none; }
+  }
+}
+
+.info-name {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.info-tag {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.coupon-box {
+  margin-top: 26px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 24px;
+
+  .eyebrow { margin-bottom: 8px; }
+}
+
+.coupon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--line);
+
+  &:last-child { border-bottom: none; }
+
+  span { font-family: var(--body); font-size: 15px; color: var(--ink-soft); }
+
+  code {
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--blue-deep);
+    border: 1px solid var(--line);
+    background: var(--white);
+    padding: 9px 14px;
+  }
+}
+
+.hotel-hint {
+  margin-top: auto;
+  padding-top: 20px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  text-align: center;
+  max-width: 24em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// segundo card ("Na região"): links mais discretos, sem tanto azul
+.info-card:last-child {
+  .info-list li { align-items: center; }
+  .hotel-link {
+    color: #6f7480;
+    font-size: 17px;
+    border-bottom: 1px solid transparent;
+
+    &:hover { color: var(--blue-deep); border-bottom-color: var(--powder); }
+  }
+  .info-tag { color: var(--ink-soft); font-size: 10px; letter-spacing: 0.2em; }
+}
+
+@media (max-width: 860px) {
+  section { padding: 70px 0; }
+  .info-grid { grid-template-columns: 1fr; }
+  .info-card {
+    border-radius: 50% 50% 4px 4px / 16% 16% 4px 4px;
+    padding: 64px 28px 36px;
+  }
+}
