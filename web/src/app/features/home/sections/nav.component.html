@@ -1,19 +1,26 @@
-<nav class="nav" [class.is-scrolled]="scrolled()">
-  <a href="#top" class="nav-mark" (click)="goTo($event, 'top')" aria-label="Início">
-    <img src="assets/bp/images/monogram.png" alt="Monograma B e P" />
-  </a>
+<nav class="nav" [class.solid]="scrolled()">
+  <ul class="nav-links">
+    <li><a href="#top" (click)="goTo($event, 'top')">Início</a></li>
+    <li><a href="#evento" (click)="goTo($event, 'evento')">Cerimônia</a></li>
+    <li><a href="#local" (click)="goTo($event, 'local')">Local</a></li>
+    <li><a href="#traje" (click)="goTo($event, 'traje')">Traje</a></li>
+    <li><a href="#hospedagem" (click)="goTo($event, 'hospedagem')">Hospedagem</a></li>
+    <li><a href="#presentes" (click)="goTo($event, 'presentes')">Presentes</a></li>
+  </ul>
+  <a class="nav-cta" href="#rsvp" (click)="goTo($event, 'rsvp')">Confirmar presença</a>
   <button type="button" class="nav-toggle" (click)="toggleMobile()" [attr.aria-expanded]="mobileOpen()" aria-label="Abrir menu">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
-<div class="menu-overlay" [class.is-open]="mobileOpen()">
+<div class="mobile-menu" [class.open]="mobileOpen()">
   <button type="button" class="menu-close" (click)="toggleMobile()" aria-label="Fechar menu">×</button>
-  <ul class="menu-list">
+  <ul>
     <li><a href="#top" (click)="goTo($event, 'top', true)">Início</a></li>
-    <li><a href="#contagem" (click)="goTo($event, 'contagem', true)">Contagem</a></li>
-    <li><a href="#evento" (click)="goTo($event, 'evento', true)">O evento</a></li>
+    <li><a href="#evento" (click)="goTo($event, 'evento', true)">Cerimônia</a></li>
+    <li><a href="#local" (click)="goTo($event, 'local', true)">Local</a></li>
     <li><a href="#traje" (click)="goTo($event, 'traje', true)">Traje</a></li>
+    <li><a href="#hospedagem" (click)="goTo($event, 'hospedagem', true)">Hospedagem</a></li>
     <li><a href="#presentes" (click)="goTo($event, 'presentes', true)">Presentes</a></li>
     <li><a href="#rsvp" (click)="goTo($event, 'rsvp', true)">Confirmar presença</a></li>
   </ul>

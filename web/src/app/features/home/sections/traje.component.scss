@@ -23,14 +23,34 @@ section {
   align-items: center;
   gap: 12px;
 
+  .eyebrow { margin-bottom: 12px; }
+
   h2 {
     font-family: var(--serif);
     font-weight: 300;
     color: var(--blue-deep);
     font-size: var(--text-3xl);
+    line-height: 1.08;
     letter-spacing: 0.02em;
+    max-width: 9em;
+    margin-bottom: 18px;
+
+    em {
+      font-family: var(--script);
+      font-style: normal;
+      color: var(--blue);
+      font-size: 1.3em;
+      letter-spacing: 0;
+    }
   }
-  p { color: var(--ink-soft); max-width: 440px; }
+  p:not(.eyebrow) {
+    color: var(--ink-soft);
+    max-width: 440px;
+    font-size: 16px;
+    line-height: 1.8;
+
+    & + p { margin-top: 10px; }
+  }
 }
 
 .swatches {

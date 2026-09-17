@@ -1,10 +1,5 @@
 <section id="rsvp" appReveal>
-  <div class="wrap">
-    <div class="section-head">
-      <p class="eyebrow">Contamos com você</p>
-      <h2>Confirme <em>presença</em></h2>
-    </div>
-
+  <div class="wrap rsvp-layout">
     @if (submitted()) {
       <div class="rsvp-card rsvp-card--thanks">
         <img src="assets/bp/images/monogram.png" alt="" />
@@ -34,25 +29,31 @@
         </div>
 
         <div class="field" [class.error]="hasError('attend')">
-          <label for="rsvpAttend">Você comparecerá?</label>
-          <select id="rsvpAttend" formControlName="attend">
-            <option value="">Selecione</option>
-            <option [value]="1">Sim, com certeza</option>
-            <option [value]="2">Infelizmente não poderei</option>
-          </select>
+          <span class="field-label">Você poderá comparecer?</span>
+          <div class="choice-group">
+            <label class="choice"><input type="radio" formControlName="attend" [value]="1" /><span>Sim, estarei presente</span></label>
+            <label class="choice"><input type="radio" formControlName="attend" [value]="2" /><span>Infelizmente não</span></label>
+          </div>
           <p class="rsvp-error">Selecione uma opção.</p>
         </div>
 
-        <div class="field" [class.error]="hasError('guests')">
-          <label for="rsvpGuests">Acompanhantes (0 se estará sozinho)</label>
-          <input id="rsvpGuests" type="number" formControlName="guests" min="0" max="10" />
-          <p class="rsvp-error">Informe entre 0 e 10.</p>
+        <div class="field">
+          <label class="toggle" for="rsvpPlusOne">
+            <input id="rsvpPlusOne" type="checkbox" formControlName="plusOne" (change)="onPlusOneChange()" />
+            <span class="toggle-box" aria-hidden="true"></span>
+            <span class="toggle-text">Vou levar um acompanhante</span>
+          </label>
         </div>
 
-        <div class="field">
-          <label for="rsvpGuestNames">Nome dos acompanhantes (opcional)</label>
-          <input id="rsvpGuestNames" type="text" formControlName="guestNames" />
-        </div>
+        @if (form.controls.plusOne.value) {
+          <div class="field companion">
+            <label for="rsvpCompanion">Nome do acompanhante</label>
+            <input id="rsvpCompanion" type="text" formControlName="companionName" autocomplete="off" />
+          </div>
+          @if (companionError()) {
+            <p class="rsvp-error rsvp-error--visible">Escreva o nome do seu acompanhante.</p>
+          }
+        }
 
         <div class="field">
           <label for="rsvpDiet">Restrição alimentar (opcional)</label>
@@ -68,5 +69,13 @@
         </button>
       </form>
     }
+
+    <div class="rsvp-intro">
+      <p class="eyebrow">Contamos com você</p>
+      <h2>Confirme sua <em>presença</em></h2>
+      <div class="rule"></div>
+      <p>Pedimos que a confirmação seja feita até <strong>30 de novembro de 2026</strong>, para que possamos organizar cada detalhe com carinho.</p>
+      <p class="rsvp-intro-note script">Será uma alegria enorme ter você com a gente.</p>
+    </div>
   </div>
 </section>

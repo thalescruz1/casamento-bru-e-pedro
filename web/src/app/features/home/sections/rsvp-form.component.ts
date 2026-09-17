@@ -5,7 +5,7 @@ import { AttendanceSim, AttendanceNao } from '../../../core/models/rsvp.models';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { MaskDirective } from '../../../shared/directives/mask.directive';
 
-type FieldKey = 'name' | 'email' | 'phone' | 'attend' | 'guests';
+type FieldKey = 'name' | 'email' | 'phone' | 'attend';
 
 @Component({
   selector: 'app-rsvp-form',
@@ -23,29 +23,40 @@ export class RsvpFormComponent {
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
     phone: ['', [Validators.pattern(/^\D*(\d\D*){10,13}$/)]],
     attend: [null as unknown as number, [Validators.required]],
-    guests: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
-    guestNames: ['', [Validators.maxLength(240)]],
+    plusOne: [false],
+    companionName: ['', [Validators.maxLength(240)]],
     restrictions: ['', [Validators.maxLength(500)]]
   });
 
   readonly submitting = signal(false);
   readonly submitted = signal(false);
   readonly serverError = signal<string | null>(null);
+  readonly companionError = signal(false);
 
   hasError(field: FieldKey): boolean {
     const control = this.form.controls[field];
     return control.invalid && (control.dirty || control.touched);
   }
 
+  onPlusOneChange(): void {
+    if (!this.form.controls.plusOne.value) {
+      this.form.controls.companionName.setValue('');
+      this.companionError.set(false);
+    }
+  }
+
   submit(): void {
     this.serverError.set(null);
-    if (this.form.invalid) {
+    const value = this.form.getRawValue();
+    const companionMissing = value.plusOne && !value.companionName.trim();
+    this.companionError.set(companionMissing);
+
+    if (this.form.invalid || companionMissing) {
       this.form.markAllAsTouched();
       return;
     }
 
     this.submitting.set(true);
-    const value = this.form.getRawValue();
     const attend = Number(value.attend) === AttendanceSim ? AttendanceSim : AttendanceNao;
     this.rsvpService
       .submit({
@@ -53,8 +64,8 @@ export class RsvpFormComponent {
         email: value.email.trim(),
         phone: value.phone.trim(),
         attend,
-        guests: Number(value.guests) || 0,
-        guestNames: value.guestNames?.trim() ? value.guestNames.trim() : null,
+        guests: value.plusOne ? 1 : 0,
+        guestNames: value.plusOne && value.companionName.trim() ? value.companionName.trim() : null,
         restrictions: value.restrictions?.trim() ? value.restrictions.trim() : null
       })
       .subscribe({
