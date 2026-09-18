@@ -105,8 +105,8 @@ button {
 .eyebrow {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.36em;
+  font-size: 15px;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--blue-deep);
   white-space: nowrap;
@@ -121,7 +121,7 @@ button {
 }
 
 @media (max-width: 560px) {
-  .eyebrow { font-size: 12px; letter-spacing: 0.28em; }
+  .eyebrow { font-size: 13px; letter-spacing: 0.26em; }
   .rule { width: 32px; }
 }
 
