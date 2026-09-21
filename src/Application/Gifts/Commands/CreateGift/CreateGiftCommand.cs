@@ -14,7 +14,8 @@ public sealed record CreateGiftCommand(
     string Title,
     string Description,
     decimal Price,
-    string? ImageBlobName) : IRequest<Result<GiftAdminDto>>;
+    string? ImageBlobName,
+    int? MaxPurchases = 1) : IRequest<Result<GiftAdminDto>>;
 
 public sealed class CreateGiftValidator : AbstractValidator<CreateGiftCommand>
 {
@@ -23,6 +24,7 @@ public sealed class CreateGiftValidator : AbstractValidator<CreateGiftCommand>
         RuleFor(x => x.Title).NotEmpty().MinimumLength(3).MaximumLength(120);
         RuleFor(x => x.Description).NotEmpty().MaximumLength(500);
         RuleFor(x => x.Price).GreaterThan(0).LessThan(1_000_000m);
+        RuleFor(x => x.MaxPurchases).InclusiveBetween(1, Gift.MaxPurchasesLimit).When(x => x.MaxPurchases.HasValue);
     }
 }
 
@@ -41,7 +43,8 @@ public sealed class CreateGiftHandler(
                 request.Description,
                 Money.FromBrl(request.Price),
                 request.ImageBlobName,
-                clock.UtcNow);
+                clock.UtcNow,
+                request.MaxPurchases);
         }
         catch (DomainException ex)
         {

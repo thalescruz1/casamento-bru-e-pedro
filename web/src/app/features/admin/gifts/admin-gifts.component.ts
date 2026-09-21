@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GiftsAdminService } from '../../../core/services/gifts.service';
@@ -10,6 +10,8 @@ import {
   GiftStatusCanceled
 } from '../../../core/models/gift.models';
 import { FilterByStatusPipe } from '../../../shared/pipes/filter-by-status.pipe';
+
+const MAX_PURCHASES_LIMIT = 1000;
 
 @Component({
   selector: 'app-admin-gifts',
@@ -37,8 +39,15 @@ export class AdminGiftsComponent implements OnInit {
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(120)]],
     description: ['', [Validators.required, Validators.maxLength(500)]],
-    price: [0, [Validators.required, Validators.min(1)]]
+    price: [0, [Validators.required, Validators.min(1)]],
+    maxPurchases: [1, [Validators.required, Validators.min(1), Validators.max(MAX_PURCHASES_LIMIT)]],
+    unlimited: [false]
   });
+
+  readonly totalPurchases = computed(() => this.gifts().reduce((sum, g) => sum + g.purchaseCount, 0));
+
+  /** Já houve compras: o valor fica travado e o limite não pode ficar abaixo do que foi comprado. */
+  readonly hasPurchases = computed(() => (this.editing()?.purchaseCount ?? 0) > 0);
 
   ngOnInit(): void {
     this.load();
@@ -62,7 +71,7 @@ export class AdminGiftsComponent implements OnInit {
   statusLabel(status: GiftStatus): string {
     switch (status) {
       case GiftStatusAvailable: return 'Disponível';
-      case GiftStatusPaid: return 'Pago';
+      case GiftStatusPaid: return 'Esgotado';
       case GiftStatusCanceled: return 'Cancelado';
       default: return 'Desconhecido';
     }
@@ -79,7 +88,8 @@ export class AdminGiftsComponent implements OnInit {
 
   newGift(): void {
     this.editing.set(null);
-    this.form.reset({ title: '', description: '', price: 0 });
+    this.form.reset({ title: '', description: '', price: 0, maxPurchases: 1, unlimited: false });
+    this.applyPurchaseRules(0);
     this.imagePreviewUrl.set(null);
     this.imageBlobName.set(null);
     this.formError.set(null);
@@ -91,12 +101,49 @@ export class AdminGiftsComponent implements OnInit {
     this.form.reset({
       title: gift.title,
       description: gift.description,
-      price: gift.price
+      price: gift.price,
+      maxPurchases: gift.maxPurchases ?? Math.max(1, gift.purchaseCount),
+      unlimited: gift.maxPurchases === null
     });
+    this.applyPurchaseRules(gift.purchaseCount);
     this.imagePreviewUrl.set(gift.imageUrl);
     this.imageBlobName.set(gift.imageBlobName);
     this.formError.set(null);
     this.showForm.set(true);
+  }
+
+  onUnlimitedChange(): void {
+    this.applyPurchaseRules(this.editing()?.purchaseCount ?? 0);
+  }
+
+  purchasesLabel(gift: AdminGift): string {
+    const noun = (gift.maxPurchases ?? gift.purchaseCount) === 1 ? 'compra' : 'compras';
+    if (gift.maxPurchases === null) {
+      return `${gift.purchaseCount} ${gift.purchaseCount === 1 ? 'compra' : 'compras'} · ilimitado`;
+    }
+    return `${gift.purchaseCount} de ${gift.maxPurchases} ${noun}`;
+  }
+
+  private applyPurchaseRules(purchaseCount: number): void {
+    const { maxPurchases, price, unlimited } = this.form.controls;
+    maxPurchases.setValidators([
+      Validators.required,
+      Validators.min(Math.max(1, purchaseCount)),
+      Validators.max(MAX_PURCHASES_LIMIT)
+    ]);
+
+    if (unlimited.value) {
+      maxPurchases.disable();
+    } else {
+      maxPurchases.enable();
+    }
+    maxPurchases.updateValueAndValidity();
+
+    if (purchaseCount > 0) {
+      price.disable();
+    } else {
+      price.enable();
+    }
   }
 
   closeForm(): void {
@@ -140,7 +187,9 @@ export class AdminGiftsComponent implements OnInit {
       title: value.title.trim(),
       description: value.description.trim(),
       price: Number(value.price),
-      imageBlobName: this.imageBlobName()
+      imageBlobName: this.imageBlobName(),
+      unlimited: value.unlimited,
+      maxPurchases: value.unlimited ? null : Number(value.maxPurchases)
     };
 
     this.saving.set(true);
@@ -165,7 +214,7 @@ export class AdminGiftsComponent implements OnInit {
   }
 
   delete(gift: AdminGift): void {
-    if (!window.confirm(`Remover "${gift.title}"? Esta ação só funciona para itens disponíveis.`)) { return; }
+    if (!window.confirm(`Remover "${gift.title}"? Só é possível remover presentes que ainda não foram comprados.`)) { return; }
     this.service.delete(gift.id).subscribe({
       next: () => this.load(),
       error: (err: { message: string }) => this.error.set(err?.message ?? 'Erro ao remover.')

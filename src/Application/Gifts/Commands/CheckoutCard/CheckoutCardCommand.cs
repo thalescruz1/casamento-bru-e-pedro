@@ -123,15 +123,17 @@ public sealed class CheckoutCardHandler(
         {
             try
             {
-                gift.MarkPaid(request.BuyerName, buyerEmail, card.ProviderPaymentId, now, request.Message);
+                (gift, _) = await GiftPurchaseRecorder.RecordAsync(
+                    repository,
+                    gift,
+                    g => g.MarkPaid(request.BuyerName, buyerEmail, card.ProviderPaymentId, now, request.Message),
+                    cancellationToken).ConfigureAwait(false);
             }
             catch (DomainException ex)
             {
                 logger.LogError(ex, "Erro ao marcar gift {GiftId} como pago após cartão Confirmed", gift.Id);
                 return Error.Validation(ex.Message);
             }
-
-            await repository.UpdateAsync(gift, cancellationToken).ConfigureAwait(false);
 
             try
             {

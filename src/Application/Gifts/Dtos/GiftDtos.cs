@@ -20,13 +20,18 @@ public sealed record GiftAdminDto(
     decimal Price,
     string Currency,
     GiftStatus Status,
-    string? BuyerName,
-    string? BuyerEmail,
-    string? BuyerMessage,
-    string? AsaasPaymentId,
-    DateTimeOffset? PaidAt,
+    int? MaxPurchases,
+    int PurchaseCount,
+    IReadOnlyList<GiftPurchaseDto> Purchases,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt);
+
+public sealed record GiftPurchaseDto(
+    string BuyerName,
+    string BuyerEmail,
+    string? Message,
+    string AsaasPaymentId,
+    DateTimeOffset PaidAt);
 
 public sealed record CheckoutPixResultDto(
     Guid GiftId,

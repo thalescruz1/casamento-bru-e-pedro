@@ -100,11 +100,14 @@ public sealed class ProcessAsaasWebhookHandler(
             return Result.Success();
         }
 
-        var wasAvailable = gift.Status == GiftStatus.Available;
-
+        bool recorded;
         try
         {
-            gift.MarkPaid(customer.Name, Email.Create(customer.Email), request.PaymentId, now);
+            (gift, recorded) = await GiftPurchaseRecorder.RecordAsync(
+                giftRepository,
+                gift,
+                g => g.MarkPaid(customer.Name, Email.Create(customer.Email), request.PaymentId, now),
+                cancellationToken).ConfigureAwait(false);
         }
         catch (DomainException ex)
         {
@@ -112,9 +115,7 @@ public sealed class ProcessAsaasWebhookHandler(
             return Error.Validation(ex.Message);
         }
 
-        await giftRepository.UpdateAsync(gift, cancellationToken).ConfigureAwait(false);
-
-        if (wasAvailable)
+        if (recorded)
         {
             logger.LogInformation("Gift {GiftId} pago por {BuyerEmail} via {EventType}", gift.Id, customer.Email, request.EventType);
             try
@@ -126,11 +127,15 @@ public sealed class ProcessAsaasWebhookHandler(
                 logger.LogError(ex, "Falha ao enviar e-mails de confirmação para gift {GiftId}", gift.Id);
             }
         }
+        else if (gift.HasPayment(request.PaymentId))
+        {
+            logger.LogDebug("Webhook repetido para payment {PaymentId} do gift {GiftId}; já estava registrado", request.PaymentId, gift.Id);
+        }
         else
         {
             logger.LogWarning(
-                "Pagamento duplicado detectado para gift {GiftId} — payment {PaymentId} chegou após {WinningPaymentId}. Estorno manual necessário.",
-                gift.Id, request.PaymentId, gift.Purchase?.AsaasPaymentId);
+                "Pagamento além do limite detectado para gift {GiftId} — payment {PaymentId} chegou depois de o presente esgotar. Estorno manual necessário.",
+                gift.Id, request.PaymentId);
         }
 
         return Result.Success();

@@ -65,14 +65,16 @@ public sealed class ConfirmManualPixHandler(
 
         try
         {
-            gift.MarkPaid(request.BuyerName, buyerEmail, manualPaymentId, now, request.Message);
+            (gift, _) = await GiftPurchaseRecorder.RecordAsync(
+                repository,
+                gift,
+                g => g.MarkPaid(request.BuyerName, buyerEmail, manualPaymentId, now, request.Message),
+                cancellationToken).ConfigureAwait(false);
         }
         catch (DomainException ex)
         {
             return Error.Validation(ex.Message);
         }
-
-        await repository.UpdateAsync(gift, cancellationToken).ConfigureAwait(false);
 
         logger.LogInformation(
             "Gift {GiftId} marcado como pago via Pix manual por {Buyer}. ConfirmaÇão pendente de verificação pelos noivos.",

@@ -2,7 +2,8 @@
   <div class="stats">
     <div><b>{{ gifts().length }}</b> itens</div>
     <div><b>{{ gifts() | filterByStatus:1 }}</b> disponíveis</div>
-    <div><b>{{ gifts() | filterByStatus:3 }}</b> pagos</div>
+    <div><b>{{ gifts() | filterByStatus:3 }}</b> esgotados</div>
+    <div><b>{{ totalPurchases() }}</b> compras</div>
   </div>
   <button type="button" class="btn btn--solid" (click)="newGift()">+ Novo presente</button>
 </div>
@@ -30,20 +31,24 @@
           <div class="row__meta">
             <span class="chip" [class]="statusClass(gift.status)">{{ statusLabel(gift.status) }}</span>
             <span>{{ gift.price | currency:gift.currency:'symbol-narrow':'1.2-2':'pt-BR' }}</span>
-            @if (gift.buyerName) {
-              <span class="row__meta-item">· {{ gift.buyerName }} ({{ gift.buyerEmail }})</span>
-            }
-            @if (gift.paidAt) {
-              <span class="row__meta-item">· Pago em {{ gift.paidAt | date:'dd/MM/yyyy HH:mm' }}</span>
-            }
+            <span class="row__meta-item">· {{ purchasesLabel(gift) }}</span>
           </div>
-          @if (gift.buyerMessage) {
-            <p class="row__message">💌 “{{ gift.buyerMessage }}”</p>
+          @if (gift.purchases.length > 0) {
+            <ul class="row__buyers">
+              @for (purchase of gift.purchases; track purchase.asaasPaymentId) {
+                <li>
+                  <span>{{ purchase.buyerName }} ({{ purchase.buyerEmail }}) · {{ purchase.paidAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                  @if (purchase.message) {
+                    <p class="row__message">💌 “{{ purchase.message }}”</p>
+                  }
+                </li>
+              }
+            </ul>
           }
         </div>
         <div class="row__actions">
-          <button type="button" (click)="edit(gift)" [disabled]="gift.status !== 1">Editar</button>
-          <button type="button" class="danger" (click)="delete(gift)" [disabled]="gift.status !== 1">Remover</button>
+          <button type="button" (click)="edit(gift)" [disabled]="gift.status === 4">Editar</button>
+          <button type="button" class="danger" (click)="delete(gift)" [disabled]="gift.status !== 1 || gift.purchaseCount > 0">Remover</button>
         </div>
       </article>
     }
@@ -68,6 +73,29 @@
         <div class="field">
           <label for="gift-price">Valor (R$)</label>
           <input id="gift-price" type="number" formControlName="price" min="1" step="0.01" />
+          @if (hasPurchases()) {
+            <small class="hint">O valor não pode mudar depois que o presente já foi comprado.</small>
+          }
+        </div>
+
+        <div class="field">
+          <label for="gift-max">Quantas vezes pode ser comprado</label>
+          <div class="limit">
+            <input id="gift-max" type="number" formControlName="maxPurchases" min="1" max="1000" step="1" />
+            <label class="check" for="gift-unlimited">
+              <input id="gift-unlimited" type="checkbox" formControlName="unlimited" (change)="onUnlimitedChange()" />
+              Ilimitado
+            </label>
+          </div>
+          <small class="hint">
+            @if (form.controls.unlimited.value) {
+              Sem limite: o presente nunca esgota, por mais compras que receba.
+            } @else if (hasPurchases()) {
+              Mínimo de {{ editing()?.purchaseCount }} (compras já feitas). Ao atingir o limite, o presente aparece como “Esgotado”.
+            } @else {
+              Use 1 para um presente único. Ao atingir o limite, o presente aparece como “Esgotado”.
+            }
+          </small>
         </div>
 
         <div class="field">

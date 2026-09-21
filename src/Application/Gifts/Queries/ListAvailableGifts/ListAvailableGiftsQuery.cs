@@ -18,10 +18,12 @@ public sealed class ListAvailableGiftsHandler(
         ListAvailableGiftsQuery request,
         CancellationToken cancellationToken)
     {
-        var gifts = await repository.ListAsync(includeUnavailable: false, cancellationToken).ConfigureAwait(false);
+        var gifts = await repository.ListAsync(includeUnavailable: true, cancellationToken).ConfigureAwait(false);
 
+        // Presentes já comprados continuam na lista pública (o front os exibe como "Esgotado");
+        // só os cancelados pelo admin saem.
         IReadOnlyList<GiftDto> dtos = gifts
-            .Where(g => g.Status == GiftStatus.Available)
+            .Where(g => g.Status is GiftStatus.Available or GiftStatus.Paid)
             .Select(g => GiftMapping.ToPublicDto(g, storage))
             .ToArray();
 

@@ -3,6 +3,7 @@ using Casamento.Application.Common;
 using Casamento.Application.Gifts.Dtos;
 using Casamento.Application.Gifts.Mapping;
 using Casamento.Domain.Common;
+using Casamento.Domain.Gifts;
 using Casamento.Domain.Gifts.ValueObjects;
 using FluentValidation;
 using MediatR;
@@ -14,7 +15,8 @@ public sealed record UpdateGiftCommand(
     string Title,
     string Description,
     decimal Price,
-    string? ImageBlobName) : IRequest<Result<GiftAdminDto>>;
+    string? ImageBlobName,
+    int? MaxPurchases) : IRequest<Result<GiftAdminDto>>;
 
 public sealed class UpdateGiftValidator : AbstractValidator<UpdateGiftCommand>
 {
@@ -24,6 +26,7 @@ public sealed class UpdateGiftValidator : AbstractValidator<UpdateGiftCommand>
         RuleFor(x => x.Title).NotEmpty().MinimumLength(3).MaximumLength(120);
         RuleFor(x => x.Description).NotEmpty().MaximumLength(500);
         RuleFor(x => x.Price).GreaterThan(0).LessThan(1_000_000m);
+        RuleFor(x => x.MaxPurchases).InclusiveBetween(1, Gift.MaxPurchasesLimit).When(x => x.MaxPurchases.HasValue);
     }
 }
 
@@ -47,6 +50,7 @@ public sealed class UpdateGiftHandler(
                 request.Description,
                 Money.FromBrl(request.Price),
                 request.ImageBlobName,
+                request.MaxPurchases,
                 clock.UtcNow);
         }
         catch (DomainException ex)
@@ -54,7 +58,15 @@ public sealed class UpdateGiftHandler(
             return Error.Conflict(ex.Message);
         }
 
-        await repository.UpdateAsync(gift, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await repository.UpdateAsync(gift, cancellationToken).ConfigureAwait(false);
+        }
+        catch (GiftConcurrencyException)
+        {
+            return Error.Conflict("O presente acabou de ser alterado (por exemplo, por uma nova compra). Recarregue a lista e tente de novo.");
+        }
+
         return GiftMapping.ToAdminDto(gift, storage);
     }
 }

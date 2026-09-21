@@ -24,19 +24,18 @@ public sealed class ListReceivedHandler(
         await Task.WhenAll(giftsTask, contributionsTask).ConfigureAwait(false);
 
         var gifts = (await giftsTask.ConfigureAwait(false))
-            .Where(g => g.Status == GiftStatus.Paid && g.Purchase is not null)
-            .Select(g => new ReceivedItemDto(
+            .SelectMany(g => g.Purchases.Select(p => new ReceivedItemDto(
                 Type: "gift",
                 Id: g.Id,
                 Title: g.Title,
                 Amount: g.Price.Amount,
                 Currency: g.Price.Currency,
-                ContributorName: g.Purchase!.BuyerName,
-                ContributorEmail: g.Purchase!.BuyerEmail.Value,
-                Message: g.Purchase!.Message,
-                AsaasPaymentId: g.Purchase!.AsaasPaymentId,
-                PaymentMethod: ResolvePaymentMethod(g.Purchase!.AsaasPaymentId),
-                PaidAt: g.Purchase!.PaidAt));
+                ContributorName: p.BuyerName,
+                ContributorEmail: p.BuyerEmail.Value,
+                Message: p.Message,
+                AsaasPaymentId: p.AsaasPaymentId,
+                PaymentMethod: ResolvePaymentMethod(p.AsaasPaymentId),
+                PaidAt: p.PaidAt)));
 
         var contributions = (await contributionsTask.ConfigureAwait(false))
             .Where(c => c.Status == ContributionStatus.Paid && c.PaidAt.HasValue)

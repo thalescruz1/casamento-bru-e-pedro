@@ -1,4 +1,5 @@
 using System.Net;
+using System.Runtime.CompilerServices;
 using Casamento.Application.Abstractions;
 using Casamento.Domain.Gifts;
 using Casamento.Infrastructure.Cosmos.Documents;
@@ -12,6 +13,9 @@ internal sealed class CosmosGiftRepository(
     IOptions<CosmosOptions> options) : IGiftRepository
 {
     private const string PartitionKeyValue = "gift";
+
+    // Versão (ETag) lida de cada presente, para detectar gravações concorrentes.
+    private static readonly ConditionalWeakTable<Gift, string> ETags = new();
     private readonly Container _container = client.GetContainer(options.Value.DatabaseName, options.Value.GiftsContainer);
 
     public async Task AddAsync(Gift gift, CancellationToken cancellationToken)
@@ -24,8 +28,28 @@ internal sealed class CosmosGiftRepository(
     public async Task UpdateAsync(Gift gift, CancellationToken cancellationToken)
     {
         var doc = GiftDocument.FromAggregate(gift);
-        await _container.UpsertItemAsync(doc, new PartitionKey(PartitionKeyValue), cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+
+        if (!ETags.TryGetValue(gift, out var etag))
+        {
+            await _container.UpsertItemAsync(doc, new PartitionKey(PartitionKeyValue), cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            return;
+        }
+
+        try
+        {
+            var response = await _container.ReplaceItemAsync(
+                doc,
+                doc.Id,
+                new PartitionKey(PartitionKeyValue),
+                new ItemRequestOptions { IfMatchEtag = etag },
+                cancellationToken).ConfigureAwait(false);
+            ETags.AddOrUpdate(gift, response.ETag);
+        }
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.PreconditionFailed)
+        {
+            throw new GiftConcurrencyException(gift.Id, ex);
+        }
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -50,7 +74,9 @@ internal sealed class CosmosGiftRepository(
                 id.ToString("N"),
                 new PartitionKey(PartitionKeyValue),
                 cancellationToken: cancellationToken).ConfigureAwait(false);
-            return response.Resource.ToAggregate();
+            var gift = response.Resource.ToAggregate();
+            ETags.AddOrUpdate(gift, response.ETag);
+            return gift;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
@@ -61,7 +87,8 @@ internal sealed class CosmosGiftRepository(
     public async Task<Gift?> FindByAsaasPaymentIdAsync(string asaasPaymentId, CancellationToken cancellationToken)
     {
         var query = new QueryDefinition(
-            "SELECT TOP 1 * FROM c WHERE c.type = @type AND c.asaasPaymentId = @pid")
+            "SELECT TOP 1 * FROM c WHERE c.type = @type AND (c.asaasPaymentId = @pid " +
+            "OR EXISTS(SELECT VALUE p FROM p IN c.purchases WHERE p.asaasPaymentId = @pid))")
             .WithParameter("@type", PartitionKeyValue)
             .WithParameter("@pid", asaasPaymentId);
 
@@ -76,7 +103,13 @@ internal sealed class CosmosGiftRepository(
             var first = response.FirstOrDefault();
             if (first is not null)
             {
-                return first.ToAggregate();
+                var gift = first.ToAggregate();
+                if (first.ETag is not null)
+                {
+                    ETags.AddOrUpdate(gift, first.ETag);
+                }
+
+                return gift;
             }
         }
 

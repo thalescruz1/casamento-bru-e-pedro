@@ -19,9 +19,9 @@ public sealed class DeleteGiftHandler(
             return Error.NotFound("Presente não encontrado.");
         }
 
-        if (gift.Status != GiftStatus.Available)
+        if (gift.Status != GiftStatus.Available || gift.PurchaseCount > 0)
         {
-            return Error.Conflict("Só é possível remover um presente disponível.");
+            return Error.Conflict("Só é possível remover um presente que ainda não foi comprado.");
         }
 
         if (gift.ImageBlobName is not null)
