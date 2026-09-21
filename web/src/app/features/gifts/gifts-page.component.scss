@@ -78,14 +78,22 @@
     margin: 6px 0 16px;
   }
 
-  p {
+  p:not(.eyebrow) {
     font-family: var(--body);
-    font-size: 17px;
-    line-height: 1.7;
+    font-size: 16px;
+    line-height: 1.75;
     color: var(--ink-soft);
 
     em { font-family: var(--serif); font-style: italic; color: var(--blue-deep); }
   }
+}
+
+/* Botões com a mesma fonte dos botões da home (Karla) */
+.btn {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.24em;
 }
 
 .gp__state {
@@ -116,7 +124,13 @@
   text-align: center;
   gap: 16px;
 
-  .btn { border-radius: 999px; }
+  .btn {
+    border-radius: 999px;
+    /* volta para a fonte original do botão (Cormorant) */
+    font-family: var(--serif);
+    font-size: 14px;
+    letter-spacing: 0.26em;
+  }
 }
 
 .gp__contribution-copy {
@@ -126,10 +140,20 @@
   gap: 8px;
 }
 
+/* Rótulo no estilo de "CAPELA DA FAZENDA A QUERÊNCIA" da home */
+.gp__contribution-copy .eyebrow {
+  font-family: var(--body);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  color: var(--blue);
+}
+
+/* Texto no estilo dos parágrafos da seção Cerimônia da home */
 .gp__contribution-text {
   font-family: var(--body);
-  font-size: 15px;
-  line-height: 1.65;
+  font-size: 16px;
+  line-height: 1.8;
   color: var(--ink-soft);
   margin: 0;
   max-width: 620px;
@@ -249,30 +273,33 @@
   flex: 1;
 }
 
+/* Título sem serifa (Karla) */
 .gift__title {
-  font-family: var(--serif);
-  font-weight: 400;
+  font-family: var(--body);
+  font-weight: 500;
   color: var(--blue-deep);
-  font-size: 22px;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
 }
 
+/* Descrição no estilo dos parágrafos da seção Cerimônia da home */
 .gift__desc {
   font-family: var(--body);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.8;
   color: var(--ink-soft);
   flex: 1;
 }
 
+/* Valor no estilo script de "15 horas" da home */
 .gift__price {
-  font-family: var(--serif);
+  font-family: var(--script);
   font-weight: 400;
-  font-size: 26px;
+  font-size: 32px;
+  line-height: 1.1;
   color: var(--blue);
-  margin: 6px 0 10px;
-  letter-spacing: 0.01em;
+  margin: 2px 0 8px;
 }
 
 .gift__taken {
@@ -289,7 +316,6 @@
 .gift .btn {
   border-radius: 999px;
   padding: 12px 22px;
-  font-size: 11px;
 }
 
 /* ─── Modal ─────────────────────────────────────────────────────── */
