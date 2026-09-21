@@ -16,7 +16,7 @@
 }
 
 .nav.solid {
-  background: linear-gradient(to bottom, rgba(245, 243, 238, 0.96), rgba(245, 243, 238, 0));
+  background: var(--paper);
 
   .nav-toggle { border-color: var(--blue-deep); background: rgba(255, 253, 249, 0.6); }
   .nav-toggle span { background: var(--blue-deep); }

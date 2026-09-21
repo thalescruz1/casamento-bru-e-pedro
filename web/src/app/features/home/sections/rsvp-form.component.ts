@@ -21,40 +21,27 @@ export class RsvpFormComponent {
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
-    phone: ['', [Validators.pattern(/^\D*(\d\D*){10,13}$/)]],
+    phone: ['', [Validators.required, Validators.pattern(/^\D*(\d\D*){10,13}$/)]],
     attend: [null as unknown as number, [Validators.required]],
-    plusOne: [false],
-    companionName: ['', [Validators.maxLength(240)]],
     restrictions: ['', [Validators.maxLength(500)]]
   });
 
   readonly submitting = signal(false);
   readonly submitted = signal(false);
   readonly serverError = signal<string | null>(null);
-  readonly companionError = signal(false);
 
   hasError(field: FieldKey): boolean {
     const control = this.form.controls[field];
     return control.invalid && (control.dirty || control.touched);
   }
 
-  onPlusOneChange(): void {
-    if (!this.form.controls.plusOne.value) {
-      this.form.controls.companionName.setValue('');
-      this.companionError.set(false);
-    }
-  }
-
   submit(): void {
     this.serverError.set(null);
-    const value = this.form.getRawValue();
-    const companionMissing = value.plusOne && !value.companionName.trim();
-    this.companionError.set(companionMissing);
-
-    if (this.form.invalid || companionMissing) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    const value = this.form.getRawValue();
 
     this.submitting.set(true);
     const attend = Number(value.attend) === AttendanceSim ? AttendanceSim : AttendanceNao;
@@ -64,8 +51,8 @@ export class RsvpFormComponent {
         email: value.email.trim(),
         phone: value.phone.trim(),
         attend,
-        guests: value.plusOne ? 1 : 0,
-        guestNames: value.plusOne && value.companionName.trim() ? value.companionName.trim() : null,
+        guests: 0,
+        guestNames: null,
         restrictions: value.restrictions?.trim() ? value.restrictions.trim() : null
       })
       .subscribe({

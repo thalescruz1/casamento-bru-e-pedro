@@ -153,7 +153,7 @@ section { padding: 110px 0; }
   flex-direction: column;
   gap: 6px;
 
-  label:not(.toggle) {
+  label {
     font-family: var(--body);
     font-size: 12px;
     letter-spacing: 0.24em;
@@ -180,69 +180,6 @@ section { padding: 110px 0; }
   }
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  padding: 6px 0;
-
-  input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-}
-
-.toggle-box {
-  display: block;
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border: 1px solid var(--line);
-  position: relative;
-  transition: border-color 0.3s ease, background 0.3s ease;
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 6px; top: 2px;
-    width: 8px; height: 13px;
-    border-right: 1.5px solid var(--white);
-    border-bottom: 1.5px solid var(--white);
-    transform: rotate(40deg) scale(0.6);
-    opacity: 0;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-  }
-}
-
-.toggle:hover .toggle-box { border-color: var(--blue); }
-
-.toggle input:checked + .toggle-box {
-  background: var(--blue-deep);
-  border-color: var(--blue-deep);
-
-  &::after { opacity: 1; transform: rotate(40deg) scale(1); }
-}
-
-.toggle input:focus-visible + .toggle-box { outline: 2px solid var(--blue); outline-offset: 2px; }
-
-.toggle-text {
-  font-family: var(--body);
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--blue-deep);
-}
-
-.companion {
-  border-left: 1px solid var(--line);
-  padding-left: 18px;
-  margin-left: 4px;
-}
-
 .rsvp-error {
   display: none;
   font-family: var(--body);
@@ -250,7 +187,7 @@ section { padding: 110px 0; }
   color: #a8312a;
   margin-top: 2px;
 
-  &--server, &--visible { display: block; }
+  &--server { display: block; }
   &--server { text-align: center; margin-top: 4px; }
 }
 

@@ -23,9 +23,9 @@
         </div>
 
         <div class="field" [class.error]="hasError('phone')">
-          <label for="rsvpPhone">Telefone (opcional)</label>
+          <label for="rsvpPhone">Telefone</label>
           <input id="rsvpPhone" type="tel" formControlName="phone" autocomplete="tel" placeholder="(11) 90000-0000" appMask="phone" maxlength="15" />
-          <p class="rsvp-error">Telefone inválido.</p>
+          <p class="rsvp-error">Informe um telefone válido, com DDD.</p>
         </div>
 
         <div class="field" [class.error]="hasError('attend')">
@@ -36,24 +36,6 @@
           </div>
           <p class="rsvp-error">Selecione uma opção.</p>
         </div>
-
-        <div class="field">
-          <label class="toggle" for="rsvpPlusOne">
-            <input id="rsvpPlusOne" type="checkbox" formControlName="plusOne" (change)="onPlusOneChange()" />
-            <span class="toggle-box" aria-hidden="true"></span>
-            <span class="toggle-text">Vou levar um acompanhante</span>
-          </label>
-        </div>
-
-        @if (form.controls.plusOne.value) {
-          <div class="field companion">
-            <label for="rsvpCompanion">Nome do acompanhante</label>
-            <input id="rsvpCompanion" type="text" formControlName="companionName" autocomplete="off" />
-          </div>
-          @if (companionError()) {
-            <p class="rsvp-error rsvp-error--visible">Escreva o nome do seu acompanhante.</p>
-          }
-        }
 
         <div class="field">
           <label for="rsvpDiet">Restrição alimentar (opcional)</label>
