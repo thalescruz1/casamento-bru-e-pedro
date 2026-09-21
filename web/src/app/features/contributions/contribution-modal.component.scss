@@ -38,6 +38,14 @@
   .modal__inner { max-height: calc(100vh - 48px); }
 }
 
+/* Botões com a mesma fonte dos botões da home (Karla) */
+.btn {
+  font-family: var(--body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+}
+
 @media (max-width: 480px) {
   .modal { padding: 12px; }
   .modal__inner {
