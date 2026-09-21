@@ -60,7 +60,7 @@ public sealed class GiftFunctions(
         }
 
         var result = await sender.Send(
-            new CreateGiftCommand(body.Title ?? string.Empty, body.Description ?? string.Empty, body.Price, body.ImageBlobName),
+            new CreateGiftCommand(body.Title ?? string.Empty, body.Description ?? string.Empty, body.Price, body.ImageBlobName, body.ResolveMaxPurchases()),
             cancellationToken).ConfigureAwait(false);
         return result.ToActionResult(StatusCodes.Status201Created);
     }
@@ -83,7 +83,7 @@ public sealed class GiftFunctions(
         }
 
         var result = await sender.Send(
-            new UpdateGiftCommand(id, body.Title ?? string.Empty, body.Description ?? string.Empty, body.Price, body.ImageBlobName),
+            new UpdateGiftCommand(id, body.Title ?? string.Empty, body.Description ?? string.Empty, body.Price, body.ImageBlobName, body.ResolveMaxPurchases()),
             cancellationToken).ConfigureAwait(false);
         return result.ToActionResult();
     }
@@ -202,7 +202,17 @@ public sealed class GiftFunctions(
         return result.ToActionResult(StatusCodes.Status201Created);
     }
 
-    private sealed record CreateGiftBody(string? Title, string? Description, decimal Price, string? ImageBlobName);
+    /// <summary><c>Unlimited</c> = presente sem limite de compras; senão <c>MaxPurchases</c> (padrão 1).</summary>
+    private sealed record CreateGiftBody(
+        string? Title,
+        string? Description,
+        decimal Price,
+        string? ImageBlobName,
+        int? MaxPurchases = null,
+        bool Unlimited = false)
+    {
+        public int? ResolveMaxPurchases() => Unlimited ? null : MaxPurchases ?? 1;
+    }
 
     private sealed record ConfirmPixBody(string? Name, string? Email, string? Message);
 

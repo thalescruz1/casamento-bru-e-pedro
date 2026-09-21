@@ -26,11 +26,11 @@ internal static class GiftMapping
             gift.Price.Amount,
             gift.Price.Currency,
             gift.Status,
-            gift.Purchase?.BuyerName,
-            gift.Purchase?.BuyerEmail.Value,
-            gift.Purchase?.Message,
-            gift.Purchase?.AsaasPaymentId,
-            gift.Purchase?.PaidAt,
+            gift.MaxPurchases,
+            gift.PurchaseCount,
+            gift.Purchases
+                .Select(p => new GiftPurchaseDto(p.BuyerName, p.BuyerEmail.Value, p.Message, p.AsaasPaymentId, p.PaidAt))
+                .ToArray(),
             gift.CreatedAt,
             gift.UpdatedAt);
     }

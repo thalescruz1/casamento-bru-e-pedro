@@ -13,13 +13,20 @@ export interface Gift {
   status: GiftStatus;
 }
 
+export interface GiftPurchase {
+  buyerName: string;
+  buyerEmail: string;
+  message: string | null;
+  asaasPaymentId: string;
+  paidAt: string;
+}
+
 export interface AdminGift extends Gift {
   imageBlobName: string | null;
-  buyerName: string | null;
-  buyerEmail: string | null;
-  buyerMessage: string | null;
-  asaasPaymentId: string | null;
-  paidAt: string | null;
+  /** Quantas vezes pode ser comprado; null = ilimitado. */
+  maxPurchases: number | null;
+  purchaseCount: number;
+  purchases: GiftPurchase[];
   createdAt: string;
   updatedAt: string;
 }
@@ -74,4 +81,6 @@ export interface CreateOrUpdateGiftPayload {
   description: string;
   price: number;
   imageBlobName: string | null;
+  maxPurchases: number | null;
+  unlimited: boolean;
 }

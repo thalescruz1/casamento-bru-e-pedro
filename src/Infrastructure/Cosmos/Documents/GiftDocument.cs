@@ -31,6 +31,17 @@ internal sealed class GiftDocument
     [JsonProperty("status")]
     public GiftStatus Status { get; set; }
 
+    /// <summary>Docs antigos não têm o campo: o padrão 1 preserva o comportamento de compra única.</summary>
+    [JsonProperty("maxPurchases")]
+    public int MaxPurchases { get; set; } = 1;
+
+    [JsonProperty("unlimited")]
+    public bool Unlimited { get; set; }
+
+    [JsonProperty("purchases")]
+    public List<PurchaseDocument>? Purchases { get; set; }
+
+    // Campos legados (compra única). Só são lidos; novos registros usam "purchases".
     [JsonProperty("buyerName")]
     public string? BuyerName { get; set; }
 
@@ -45,6 +56,10 @@ internal sealed class GiftDocument
 
     [JsonProperty("paidAt")]
     public DateTimeOffset? PaidAt { get; set; }
+
+    // Preenchido pelo Cosmos na leitura; não é enviado na gravação.
+    [JsonProperty("_etag", NullValueHandling = NullValueHandling.Ignore)]
+    public string? ETag { get; set; }
 
     [JsonProperty("createdAt")]
     public DateTimeOffset CreatedAt { get; set; }
@@ -62,11 +77,9 @@ internal sealed class GiftDocument
         PriceAmount = gift.Price.Amount,
         PriceCurrency = gift.Price.Currency,
         Status = gift.Status,
-        BuyerName = gift.Purchase?.BuyerName,
-        BuyerEmail = gift.Purchase?.BuyerEmail.Value,
-        BuyerMessage = gift.Purchase?.Message,
-        AsaasPaymentId = gift.Purchase?.AsaasPaymentId,
-        PaidAt = gift.Purchase?.PaidAt,
+        MaxPurchases = gift.MaxPurchases ?? 1,
+        Unlimited = gift.MaxPurchases is null,
+        Purchases = gift.Purchases.Select(PurchaseDocument.FromPurchase).ToList(),
         CreatedAt = gift.CreatedAt,
         UpdatedAt = gift.UpdatedAt
     };
@@ -90,20 +103,13 @@ internal sealed class GiftDocument
         var effectiveStatus = Status == (GiftStatus)2 ? GiftStatus.Available : Status;
         SetPrivate(gift, nameof(Gift.Status), effectiveStatus);
 
-        if (effectiveStatus == GiftStatus.Paid
-            && BuyerName is not null
-            && BuyerEmail is not null
-            && AsaasPaymentId is not null
-            && PaidAt.HasValue)
-        {
-            var purchase = new Purchase(
-                BuyerName: BuyerName,
-                BuyerEmail: Email.Create(BuyerEmail),
-                AsaasPaymentId: AsaasPaymentId,
-                PaidAt: PaidAt.Value,
-                Message: BuyerMessage);
-            SetPrivate(gift, nameof(Gift.Purchase), purchase);
-        }
+        SetPrivate(gift, nameof(Gift.MaxPurchases), Unlimited ? null : (int?)MaxPurchases);
+
+        var purchases = Purchases is { Count: > 0 }
+            ? Purchases.Select(p => p.ToPurchase()).ToList()
+            : ReadLegacyPurchase(effectiveStatus);
+        var field = typeof(Gift).GetField("_purchases", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+        ((List<Purchase>)field.GetValue(gift)!).AddRange(purchases);
 
         SetPrivate(gift, nameof(Gift.CreatedAt), CreatedAt);
         SetPrivate(gift, nameof(Gift.UpdatedAt), UpdatedAt);
@@ -111,9 +117,65 @@ internal sealed class GiftDocument
         return gift;
     }
 
+    private List<Purchase> ReadLegacyPurchase(GiftStatus effectiveStatus)
+    {
+        if (effectiveStatus == GiftStatus.Paid
+            && BuyerName is not null
+            && BuyerEmail is not null
+            && AsaasPaymentId is not null
+            && PaidAt.HasValue)
+        {
+            return
+            [
+                new Purchase(
+                    BuyerName: BuyerName,
+                    BuyerEmail: Email.Create(BuyerEmail),
+                    AsaasPaymentId: AsaasPaymentId,
+                    PaidAt: PaidAt.Value,
+                    Message: BuyerMessage)
+            ];
+        }
+
+        return [];
+    }
+
     private static void SetPrivate(object target, string propertyName, object? value)
     {
         var prop = target.GetType().GetProperty(propertyName)!;
         prop.GetSetMethod(nonPublic: true)!.Invoke(target, [value]);
     }
+}
+
+internal sealed class PurchaseDocument
+{
+    [JsonProperty("buyerName")]
+    public string BuyerName { get; set; } = string.Empty;
+
+    [JsonProperty("buyerEmail")]
+    public string BuyerEmail { get; set; } = string.Empty;
+
+    [JsonProperty("message")]
+    public string? Message { get; set; }
+
+    [JsonProperty("asaasPaymentId")]
+    public string AsaasPaymentId { get; set; } = string.Empty;
+
+    [JsonProperty("paidAt")]
+    public DateTimeOffset PaidAt { get; set; }
+
+    public static PurchaseDocument FromPurchase(Purchase purchase) => new()
+    {
+        BuyerName = purchase.BuyerName,
+        BuyerEmail = purchase.BuyerEmail.Value,
+        Message = purchase.Message,
+        AsaasPaymentId = purchase.AsaasPaymentId,
+        PaidAt = purchase.PaidAt
+    };
+
+    public Purchase ToPurchase() => new(
+        BuyerName,
+        Email.Create(BuyerEmail),
+        AsaasPaymentId,
+        PaidAt,
+        Message);
 }
