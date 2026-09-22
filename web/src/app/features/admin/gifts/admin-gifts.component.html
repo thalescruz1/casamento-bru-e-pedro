@@ -37,7 +37,7 @@
             <ul class="row__buyers">
               @for (purchase of gift.purchases; track purchase.asaasPaymentId) {
                 <li>
-                  <span>{{ purchase.buyerName }} ({{ purchase.buyerEmail }}) · {{ purchase.paidAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                  <span>{{ purchase.buyerName }} ({{ purchase.buyerEmail }}) · {{ purchase.amount | currency:purchase.currency:'symbol-narrow':'1.2-2':'pt-BR' }} · {{ purchase.paidAt | date:'dd/MM/yyyy HH:mm' }}</span>
                   @if (purchase.message) {
                     <p class="row__message">💌 “{{ purchase.message }}”</p>
                   }
@@ -48,7 +48,7 @@
         </div>
         <div class="row__actions">
           <button type="button" (click)="edit(gift)" [disabled]="gift.status === 4">Editar</button>
-          <button type="button" class="danger" (click)="delete(gift)" [disabled]="gift.status !== 1 || gift.purchaseCount > 0">Remover</button>
+          <button type="button" class="danger" (click)="delete(gift)" [disabled]="gift.purchaseCount === 0 && gift.status !== 1">Remover</button>
         </div>
       </article>
     }
@@ -74,7 +74,7 @@
           <label for="gift-price">Valor (R$)</label>
           <input id="gift-price" type="number" formControlName="price" min="1" step="0.01" />
           @if (hasPurchases()) {
-            <small class="hint">O valor não pode mudar depois que o presente já foi comprado.</small>
+            <small class="hint">Quem já comprou mantém o valor pago; só as próximas compras usam esse valor novo.</small>
           }
         </div>
 

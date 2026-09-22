@@ -142,16 +142,20 @@ public sealed class GiftMultiplePurchasesTests
     }
 
     [Fact]
-    public void Price_is_locked_after_the_first_purchase_but_texts_can_change()
+    public void Changing_the_price_does_not_alter_what_was_already_paid()
     {
         var gift = NewGift(5);
         Buy(gift, "pay_1");
+        gift.Purchases[0].Amount.Amount.Should().Be(100m);
 
-        var changePrice = () => gift.UpdateDetails("Item", "Desc", Money.FromBrl(250m), null, 5, Now);
-        changePrice.Should().Throw<DomainException>();
+        gift.UpdateDetails("Novo título", "Nova descrição", Money.FromBrl(250m), null, 5, Now);
 
-        gift.UpdateDetails("Novo título", "Nova descrição", Money.FromBrl(100m), null, 5, Now);
         gift.Title.Should().Be("Novo título");
+        gift.Price.Amount.Should().Be(250m);
+        gift.Purchases[0].Amount.Amount.Should().Be(100m, "o valor de uma compra já feita não muda retroativamente");
+
+        Buy(gift, "pay_2");
+        gift.Purchases[1].Amount.Amount.Should().Be(250m, "as próximas compras usam o preço novo");
     }
 
     [Fact]
@@ -181,6 +185,56 @@ public sealed class GiftMultiplePurchasesTests
     {
         var gift = NewGift(1);
         gift.Cancel(Now);
+
+        var act = () => gift.UpdateDetails("Item", "Desc", Money.FromBrl(100m), null, 1, Now);
+
+        act.Should().Throw<DomainException>();
+    }
+
+    [Fact]
+    public void Marking_a_gift_deleted_keeps_its_purchase_history()
+    {
+        var gift = NewGift(3);
+        Buy(gift, "pay_1");
+        Buy(gift, "pay_2");
+
+        gift.MarkDeleted(Now);
+
+        gift.DeletedAt.Should().Be(Now);
+        gift.PurchaseCount.Should().Be(2);
+        gift.Purchases.Select(p => p.AsaasPaymentId).Should().Equal("pay_1", "pay_2");
+    }
+
+    [Fact]
+    public void Marking_a_gift_deleted_is_idempotent()
+    {
+        var gift = NewGift(1);
+        Buy(gift, "pay_1");
+
+        gift.MarkDeleted(Now);
+        gift.MarkDeleted(Now.AddDays(1));
+
+        gift.DeletedAt.Should().Be(Now, "a primeira exclusão vence; chamar de novo não é erro, mas também não reescreve a data");
+    }
+
+    [Fact]
+    public void A_deleted_gift_rejects_new_purchases_even_if_it_was_not_sold_out()
+    {
+        var gift = NewGift(5);
+        Buy(gift, "pay_1");
+        gift.MarkDeleted(Now);
+
+        var act = () => Buy(gift, "pay_2");
+
+        act.Should().Throw<DomainException>();
+    }
+
+    [Fact]
+    public void A_deleted_gift_cannot_be_edited()
+    {
+        var gift = NewGift(1);
+        Buy(gift, "pay_1");
+        gift.MarkDeleted(Now);
 
         var act = () => gift.UpdateDetails("Item", "Desc", Money.FromBrl(100m), null, 1, Now);
 

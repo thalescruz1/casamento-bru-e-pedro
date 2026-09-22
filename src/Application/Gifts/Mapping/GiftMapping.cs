@@ -29,7 +29,7 @@ internal static class GiftMapping
             gift.MaxPurchases,
             gift.PurchaseCount,
             gift.Purchases
-                .Select(p => new GiftPurchaseDto(p.BuyerName, p.BuyerEmail.Value, p.Message, p.AsaasPaymentId, p.PaidAt))
+                .Select(p => new GiftPurchaseDto(p.BuyerName, p.BuyerEmail.Value, p.Message, p.AsaasPaymentId, p.PaidAt, p.Amount.Amount, p.Amount.Currency))
                 .ToArray(),
             gift.CreatedAt,
             gift.UpdatedAt);

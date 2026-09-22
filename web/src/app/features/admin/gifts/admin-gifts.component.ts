@@ -46,7 +46,7 @@ export class AdminGiftsComponent implements OnInit {
 
   readonly totalPurchases = computed(() => this.gifts().reduce((sum, g) => sum + g.purchaseCount, 0));
 
-  /** Já houve compras: o valor fica travado e o limite não pode ficar abaixo do que foi comprado. */
+  /** Já houve compras: o limite não pode ficar abaixo do que já foi comprado (o valor pode mudar livremente). */
   readonly hasPurchases = computed(() => (this.editing()?.purchaseCount ?? 0) > 0);
 
   ngOnInit(): void {
@@ -125,7 +125,7 @@ export class AdminGiftsComponent implements OnInit {
   }
 
   private applyPurchaseRules(purchaseCount: number): void {
-    const { maxPurchases, price, unlimited } = this.form.controls;
+    const { maxPurchases, unlimited } = this.form.controls;
     maxPurchases.setValidators([
       Validators.required,
       Validators.min(Math.max(1, purchaseCount)),
@@ -138,12 +138,6 @@ export class AdminGiftsComponent implements OnInit {
       maxPurchases.enable();
     }
     maxPurchases.updateValueAndValidity();
-
-    if (purchaseCount > 0) {
-      price.disable();
-    } else {
-      price.enable();
-    }
   }
 
   closeForm(): void {
@@ -214,7 +208,11 @@ export class AdminGiftsComponent implements OnInit {
   }
 
   delete(gift: AdminGift): void {
-    if (!window.confirm(`Remover "${gift.title}"? Só é possível remover presentes que ainda não foram comprados.`)) { return; }
+    const message = gift.purchaseCount > 0
+      ? `Remover "${gift.title}"? Ele some da lista de presentes, mas as ${gift.purchaseCount} ${gift.purchaseCount === 1 ? 'compra' : 'compras'} já feitas continuam em Recebidos.`
+      : `Remover "${gift.title}"?`;
+    if (!window.confirm(message)) { return; }
+
     this.service.delete(gift.id).subscribe({
       next: () => this.load(),
       error: (err: { message: string }) => this.error.set(err?.message ?? 'Erro ao remover.')

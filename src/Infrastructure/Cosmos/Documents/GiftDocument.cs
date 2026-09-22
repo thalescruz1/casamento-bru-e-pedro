@@ -41,6 +41,10 @@ internal sealed class GiftDocument
     [JsonProperty("purchases")]
     public List<PurchaseDocument>? Purchases { get; set; }
 
+    /// <summary>Exclusão lógica: o presente some das listas, mas o documento (e as compras) fica.</summary>
+    [JsonProperty("deletedAt")]
+    public DateTimeOffset? DeletedAt { get; set; }
+
     // Campos legados (compra única). Só são lidos; novos registros usam "purchases".
     [JsonProperty("buyerName")]
     public string? BuyerName { get; set; }
@@ -80,6 +84,7 @@ internal sealed class GiftDocument
         MaxPurchases = gift.MaxPurchases ?? 1,
         Unlimited = gift.MaxPurchases is null,
         Purchases = gift.Purchases.Select(PurchaseDocument.FromPurchase).ToList(),
+        DeletedAt = gift.DeletedAt,
         CreatedAt = gift.CreatedAt,
         UpdatedAt = gift.UpdatedAt
     };
@@ -104,6 +109,7 @@ internal sealed class GiftDocument
         SetPrivate(gift, nameof(Gift.Status), effectiveStatus);
 
         SetPrivate(gift, nameof(Gift.MaxPurchases), Unlimited ? null : (int?)MaxPurchases);
+        SetPrivate(gift, nameof(Gift.DeletedAt), DeletedAt);
 
         var purchases = Purchases is { Count: > 0 }
             ? Purchases.Select(p => p.ToPurchase()).ToList()
@@ -132,6 +138,9 @@ internal sealed class GiftDocument
                     BuyerEmail: Email.Create(BuyerEmail),
                     AsaasPaymentId: AsaasPaymentId,
                     PaidAt: PaidAt.Value,
+                    // Doc antigo (pré multi-compra) não guardava o valor por compra à parte;
+                    // o preço do presente na época é a melhor aproximação disponível.
+                    Amount: Money.FromBrl(PriceAmount),
                     Message: BuyerMessage)
             ];
         }
@@ -163,19 +172,28 @@ internal sealed class PurchaseDocument
     [JsonProperty("paidAt")]
     public DateTimeOffset PaidAt { get; set; }
 
+    [JsonProperty("amount")]
+    public decimal Amount { get; set; }
+
+    [JsonProperty("currency")]
+    public string Currency { get; set; } = "BRL";
+
     public static PurchaseDocument FromPurchase(Purchase purchase) => new()
     {
         BuyerName = purchase.BuyerName,
         BuyerEmail = purchase.BuyerEmail.Value,
         Message = purchase.Message,
         AsaasPaymentId = purchase.AsaasPaymentId,
-        PaidAt = purchase.PaidAt
+        PaidAt = purchase.PaidAt,
+        Amount = purchase.Amount.Amount,
+        Currency = purchase.Amount.Currency
     };
 
     public Purchase ToPurchase() => new(
-        BuyerName,
-        Email.Create(BuyerEmail),
-        AsaasPaymentId,
-        PaidAt,
-        Message);
+        BuyerName: BuyerName,
+        BuyerEmail: Email.Create(BuyerEmail),
+        AsaasPaymentId: AsaasPaymentId,
+        PaidAt: PaidAt,
+        Amount: Money.FromBrl(Amount),
+        Message: Message);
 }

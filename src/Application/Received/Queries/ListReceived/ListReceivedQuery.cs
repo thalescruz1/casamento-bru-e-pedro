@@ -23,13 +23,16 @@ public sealed class ListReceivedHandler(
 
         await Task.WhenAll(giftsTask, contributionsTask).ConfigureAwait(false);
 
+        // Compras excluídas pelo admin (DeletedAt) continuam aqui de propósito: o histórico de
+        // quem pagou não pode sumir. Amount vem da compra (Purchase.Amount), não do preço atual
+        // do presente — o preço pode ter mudado depois dessa compra específica.
         var gifts = (await giftsTask.ConfigureAwait(false))
             .SelectMany(g => g.Purchases.Select(p => new ReceivedItemDto(
                 Type: "gift",
                 Id: g.Id,
                 Title: g.Title,
-                Amount: g.Price.Amount,
-                Currency: g.Price.Currency,
+                Amount: p.Amount.Amount,
+                Currency: p.Amount.Currency,
                 ContributorName: p.BuyerName,
                 ContributorEmail: p.BuyerEmail.Value,
                 Message: p.Message,

@@ -19,6 +19,9 @@ export interface GiftPurchase {
   message: string | null;
   asaasPaymentId: string;
   paidAt: string;
+  /** Valor efetivamente pago nesta compra — pode diferir do preço atual do presente. */
+  amount: number;
+  currency: string;
 }
 
 export interface AdminGift extends Gift {
