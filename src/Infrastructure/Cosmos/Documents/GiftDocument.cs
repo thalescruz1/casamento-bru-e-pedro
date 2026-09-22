@@ -112,7 +112,7 @@ internal sealed class GiftDocument
         SetPrivate(gift, nameof(Gift.DeletedAt), DeletedAt);
 
         var purchases = Purchases is { Count: > 0 }
-            ? Purchases.Select(p => p.ToPurchase()).ToList()
+            ? Purchases.Select(p => p.ToPurchase(PriceAmount)).ToList()
             : ReadLegacyPurchase(effectiveStatus);
         var field = typeof(Gift).GetField("_purchases", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
         ((List<Purchase>)field.GetValue(gift)!).AddRange(purchases);
@@ -189,11 +189,20 @@ internal sealed class PurchaseDocument
         Currency = purchase.Amount.Currency
     };
 
-    public Purchase ToPurchase() => new(
-        BuyerName: BuyerName,
-        BuyerEmail: Email.Create(BuyerEmail),
-        AsaasPaymentId: AsaasPaymentId,
-        PaidAt: PaidAt,
-        Amount: Money.FromBrl(Amount),
-        Message: Message);
+    public Purchase ToPurchase() => ToPurchase(fallbackAmount: 0m);
+
+    // Purchases criadas antes do PR que adicionou `amount` no PurchaseDocument
+    // não têm o campo no JSON — nesses casos, cai pro preço do próprio presente
+    // (que era a única fonte de valor no schema legado).
+    public Purchase ToPurchase(decimal fallbackAmount)
+    {
+        var amount = Amount > 0m ? Amount : fallbackAmount;
+        return new Purchase(
+            BuyerName: BuyerName,
+            BuyerEmail: Email.Create(BuyerEmail),
+            AsaasPaymentId: AsaasPaymentId,
+            PaidAt: PaidAt,
+            Amount: Money.FromBrl(amount),
+            Message: Message);
+    }
 }
