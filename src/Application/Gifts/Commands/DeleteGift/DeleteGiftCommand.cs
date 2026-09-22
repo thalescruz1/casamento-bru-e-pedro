@@ -1,5 +1,6 @@
 using Casamento.Application.Abstractions;
 using Casamento.Application.Common;
+using Casamento.Domain.Common;
 using Casamento.Domain.Gifts;
 using MediatR;
 
@@ -9,7 +10,8 @@ public sealed record DeleteGiftCommand(Guid Id) : IRequest<Result>;
 
 public sealed class DeleteGiftHandler(
     IGiftRepository repository,
-    IGiftImageStorage storage) : IRequestHandler<DeleteGiftCommand, Result>
+    IGiftImageStorage storage,
+    IClock clock) : IRequestHandler<DeleteGiftCommand, Result>
 {
     public async Task<Result> Handle(DeleteGiftCommand request, CancellationToken cancellationToken)
     {
@@ -19,9 +21,34 @@ public sealed class DeleteGiftHandler(
             return Error.NotFound("Presente não encontrado.");
         }
 
-        if (gift.Status != GiftStatus.Available || gift.PurchaseCount > 0)
+        // Presente com compras não pode ser removido de verdade — o histórico (quem comprou,
+        // quanto pagou) continua existindo em Recebidos. Exclusão lógica: só some das listas.
+        if (gift.PurchaseCount > 0)
         {
-            return Error.Conflict("Só é possível remover um presente que ainda não foi comprado.");
+            try
+            {
+                gift.MarkDeleted(clock.UtcNow);
+            }
+            catch (DomainException ex)
+            {
+                return Error.Conflict(ex.Message);
+            }
+
+            try
+            {
+                await repository.UpdateAsync(gift, cancellationToken).ConfigureAwait(false);
+            }
+            catch (GiftConcurrencyException)
+            {
+                return Error.Conflict("O presente acabou de ser alterado (por exemplo, por uma nova compra). Recarregue a lista e tente de novo.");
+            }
+
+            return Result.Success();
+        }
+
+        if (gift.Status != GiftStatus.Available)
+        {
+            return Error.Conflict("Só é possível remover um presente disponível.");
         }
 
         if (gift.ImageBlobName is not null)

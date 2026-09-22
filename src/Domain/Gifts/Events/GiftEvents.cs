@@ -18,3 +18,5 @@ public sealed record GiftPaymentConflict(
     DateTimeOffset OccurredAt) : IDomainEvent;
 
 public sealed record GiftCanceled(Guid GiftId, DateTimeOffset OccurredAt) : IDomainEvent;
+
+public sealed record GiftDeleted(Guid GiftId, DateTimeOffset OccurredAt) : IDomainEvent;

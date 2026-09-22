@@ -46,7 +46,7 @@ public sealed class ConfirmManualPixHandler(
             return Error.NotFound("Presente não encontrado.");
         }
 
-        if (gift.Status != GiftStatus.Available)
+        if (gift.Status != GiftStatus.Available || gift.DeletedAt is not null)
         {
             return Error.Conflict("Este presente já não está disponível.");
         }

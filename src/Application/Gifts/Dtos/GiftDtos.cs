@@ -31,7 +31,9 @@ public sealed record GiftPurchaseDto(
     string BuyerEmail,
     string? Message,
     string AsaasPaymentId,
-    DateTimeOffset PaidAt);
+    DateTimeOffset PaidAt,
+    decimal Amount,
+    string Currency);
 
 public sealed record CheckoutPixResultDto(
     Guid GiftId,

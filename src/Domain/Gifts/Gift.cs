@@ -21,6 +21,13 @@ public sealed class Gift : AggregateRoot
     public Money Price { get; private set; }
     public GiftStatus Status { get; private set; }
 
+    /// <summary>
+    /// Quando o presente foi excluído pelo admin. Presentes com compras não são apagados de
+    /// verdade (o histórico de quem comprou precisa continuar existindo em Recebidos) — só
+    /// somem das listas. <c>null</c> = não excluído.
+    /// </summary>
+    public DateTimeOffset? DeletedAt { get; private set; }
+
     /// <summary>Quantas vezes o presente pode ser comprado. <c>null</c> = ilimitado.</summary>
     public int? MaxPurchases { get; private set; } = 1;
 
@@ -76,11 +83,14 @@ public sealed class Gift : AggregateRoot
             throw new DomainException("Este presente foi cancelado e não pode ser editado.");
         }
 
-        if (_purchases.Count > 0 && price != Price)
+        if (DeletedAt is not null)
         {
-            throw new DomainException("O valor não pode mudar depois que o presente já foi comprado.");
+            throw new DomainException("Este presente foi excluído e não pode ser editado.");
         }
 
+        // O valor pode mudar mesmo com compras feitas: cada compra já registrada guarda o
+        // valor que foi de fato cobrado (Purchase.Amount), então o histórico não se altera —
+        // só as próximas compras (vagas que sobraram) usam o valor novo.
         var (validatedTitle, validatedDescription) = ValidateTextFields(title, description);
         ValidateMaxPurchases(maxPurchases, _purchases.Count);
 
@@ -134,12 +144,12 @@ public sealed class Gift : AggregateRoot
             return false;
         }
 
-        if (Status != GiftStatus.Available)
+        if (Status != GiftStatus.Available || DeletedAt is not null)
         {
             throw new DomainException("Este presente não está mais disponível.");
         }
 
-        _purchases.Add(new Purchase(trimmed, buyerEmail, asaasPaymentId, now, sanitizedMessage));
+        _purchases.Add(new Purchase(trimmed, buyerEmail, asaasPaymentId, now, Price, sanitizedMessage));
         if (IsSoldOut())
         {
             Status = GiftStatus.Paid;
@@ -153,6 +163,23 @@ public sealed class Gift : AggregateRoot
 
     public bool HasPayment(string asaasPaymentId) =>
         _purchases.Exists(p => p.AsaasPaymentId == asaasPaymentId);
+
+    /// <summary>
+    /// Exclusão lógica: o presente some das listas (pública e do admin), mas continua existindo
+    /// — as compras já feitas seguem aparecendo em Recebidos. Idempotente.
+    /// </summary>
+    public void MarkDeleted(DateTimeOffset now)
+    {
+        if (DeletedAt is not null)
+        {
+            return;
+        }
+
+        DeletedAt = now;
+        UpdatedAt = now;
+
+        Raise(new GiftDeleted(Id, now));
+    }
 
     public void Cancel(DateTimeOffset now)
     {

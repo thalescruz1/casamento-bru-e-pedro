@@ -35,4 +35,19 @@ public sealed class ListAvailableGiftsHandlerTests
         result.Value!.Select(g => g.Title).Should().BeEquivalentTo("Disponível", "Comprado");
         result.Value!.Single(g => g.Title == "Comprado").Status.Should().Be(GiftStatus.Paid);
     }
+
+    [Fact]
+    public async Task Deleted_gift_does_not_show_up_even_if_it_was_not_sold_out()
+    {
+        var deleted = Gift.Create("Excluído", "Desc", Money.FromBrl(100m), null, Now);
+        deleted.MarkPaid("Fulano", Email.Create("f@x.com"), "pay_1", Now);
+        deleted.MarkDeleted(Now);
+
+        _repository.ListAsync(true, Arg.Any<CancellationToken>()).Returns(new[] { deleted });
+
+        var handler = new ListAvailableGiftsHandler(_repository, _storage);
+        var result = await handler.Handle(new ListAvailableGiftsQuery(), CancellationToken.None);
+
+        result.Value!.Should().BeEmpty();
+    }
 }

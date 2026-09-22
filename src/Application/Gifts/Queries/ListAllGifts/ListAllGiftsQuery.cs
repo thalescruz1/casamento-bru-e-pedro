@@ -19,6 +19,7 @@ public sealed class ListAllGiftsHandler(
     {
         var gifts = await repository.ListAsync(includeUnavailable: true, cancellationToken).ConfigureAwait(false);
         IReadOnlyList<GiftAdminDto> dtos = gifts
+            .Where(g => g.DeletedAt is null)
             .Select(g => GiftMapping.ToAdminDto(g, storage))
             .ToArray();
         return Result<IReadOnlyList<GiftAdminDto>>.Success(dtos);
