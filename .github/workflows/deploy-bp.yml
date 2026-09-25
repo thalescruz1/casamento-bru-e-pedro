@@ -35,6 +35,10 @@ jobs:
         working-directory: web
         run: npx ng build --configuration production
 
+      # Se algum teste falhar, o deploy não acontece.
+      - name: Run backend tests
+        run: dotnet test casamento.slnx -c Release --nologo
+
       - name: Publish .NET Functions
         run: dotnet publish src/Api/Casamento.Api.csproj -c Release -o api-publish
 
