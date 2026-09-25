@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval, startWith } from 'rxjs';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 
-const TARGET = new Date('2027-02-12T15:00:00-03:00').getTime();
+const TARGET = new Date('2027-02-12T15:30:00-03:00').getTime();
 const pad = (n: number) => n.toString().padStart(2, '0');
 
 @Component({
